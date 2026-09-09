@@ -1,0 +1,60 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+<!--
+    <record model="ir.ui.view" id="rastreo_paquetes.list">
+      <field name="name">rastreo_paquetes list</field>
+      <field name="model">rastreo_paquetes.rastreo_paquetes</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </list>
+      </field>
+    </record>
+-->
+
+    <!-- actions opening views on models -->
+<!--
+    <record model="ir.actions.act_window" id="rastreo_paquetes.action_window">
+      <field name="name">rastreo_paquetes window</field>
+      <field name="res_model">rastreo_paquetes.rastreo_paquetes</field>
+      <field name="view_mode">list,form</field>
+    </record>
+-->
+
+    <!-- server action to the one above -->
+<!--
+    <record model="ir.actions.server" id="rastreo_paquetes.action_server">
+      <field name="name">rastreo_paquetes server</field>
+      <field name="model_id" ref="model_rastreo_paquetes_rastreo_paquetes"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "list,form",
+          "res_model": model._name,
+        }
+      </field>
+    </record>
+-->
+
+    <!-- Top menu item -->
+<!--
+    <menuitem name="rastreo_paquetes" id="rastreo_paquetes.menu_root"/>
+-->
+    <!-- menu categories -->
+<!--
+    <menuitem name="Menu 1" id="rastreo_paquetes.menu_1" parent="rastreo_paquetes.menu_root"/>
+    <menuitem name="Menu 2" id="rastreo_paquetes.menu_2" parent="rastreo_paquetes.menu_root"/>
+-->
+    <!-- actions -->
+<!--
+    <menuitem name="List" id="rastreo_paquetes.menu_1_list" parent="rastreo_paquetes.menu_1"
+              action="rastreo_paquetes.action_window"/>
+    <menuitem name="Server to list" id="rastreo_paquetes" parent="rastreo_paquetes.menu_2"
+              action="rastreo_paquetes.action_server"/>
+-->
+  </data>
+</odoo>
