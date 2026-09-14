@@ -1,0 +1,82 @@
+.rastreo-dashboard {
+    padding: 8px;
+    background: #f8f0f0;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    margin-bottom: 5px;
+    padding: 5px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dashboard-columns {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    padding: 5px 0;
+}
+
+.column {
+    flex: 0 0 300px;
+    background: #ffffff;
+    border-radius: 4px;
+    padding: 4px;
+    min-height: 400px;
+}
+
+.column-header {
+    font-weight: bold;
+    padding: 5px;
+    background: #cbceff;
+    border-radius: 5px;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.column-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.card {
+    background: white;
+    padding: 6px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.card-body {
+    font-size: 14px;
+}
+
+
+.mi-contenedor-boton {
+    padding: 10px;
+    text-align: center;
+}
+
+.mi-boton-personalizado {
+    background-color: #52e6fd !important;   /* color Odoo */
+    color: #ffffff !important;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mi-boton-personalizado:hover {
+    background-color: #52ffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mi-boton-personalizado:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(3, 255, 196, 0.36);
+}

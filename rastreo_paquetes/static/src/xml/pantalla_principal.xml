@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+    <!-- Esta es la plantilla principal de tu widget -->
+    <t t-name="rastreo_paquetes.pantalla_principal">
+        <div class="rastreo-dashboard">
+            <div class="dashboard-header">
+                <h2>Logística</h2>
+                    <button type="button"
+                            class="btn mi-boton-personalizado"
+                            t-on-click="onClickCrearPedido">
+                            <i class="fa fa-star"/> Pruebas
+                    </button>
+                    
+            </div>
+            <div class="dashboard-columns">
+                <div class="column" t-foreach="state.columns" t-as="col" t-key="col.name">
+                    <div class="column-header">
+                        <t t-esc="col.name"/>
+                    </div>
+                    <div class="column-content">
+                        <div class="card" t-foreach="col.packages" t-as="p" t-key="p.id">
+                            <div class="card-body">
+                                <strong>Guía: <t t-esc="p.numero_guia"/></strong>
+                                <strong>Cliente: <t t-esc="p.cliente_id ? p.cliente_id.display_name : ''"/></strong>
+                                <div>Anticipo recibido de cliente: <t t-esc="p.anticipo_cliente || 0"/></div>
+                                <div>Anticipo dado a proveedor: <t t-esc="p.anticipo_proveedor || 0"/></div>
+                                <div>Ultima actualizacion: <t t-esc="p.fecha_actualizacion || ''"/></div>
+                            </div>
+                            <button type="button"
+                                        class="btn btn-sm btn-secondary mt-2"
+                                        t-on-click="() => this.onClickEditarPedido(p.id)">
+                                    <i class="fa fa-pencil"/> Editar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

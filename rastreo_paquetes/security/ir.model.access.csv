@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_rastreo_paquetes_rastreo_paquetes,rastreo_paquetes.rastreo_paquetes,model_rastreo_paquetes_rastreo_paquetes,base.group_user,1,1,1,1
+access_rastreo_pedido_user,rastreo.pedido.user,model_rastreo_pedido,base.group_user,1,1,1,1
