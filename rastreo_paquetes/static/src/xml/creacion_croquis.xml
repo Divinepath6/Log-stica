@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="rastreo_paquetes.creacion_croquis_embed">
+        <div class="cc-croquis">
+            <!-- Estado vacío -->
+            <div t-if="!layout.valido" class="cc-croquis-empty">
+                <i class="fa fa-cubes"/>
+                <p>Completa los datos y presiona <strong>Recalcular</strong></p>
+            </div>
+
+            <!-- SVG con el croquis -->
+            <svg t-else=""
+                class="cc-croquis-svg"
+                viewBox="0 0 800 500"
+                preserveAspectRatio="xMidYMid meet">
+
+                <!-- Bodega -->
+                <rect
+                    t-att-x="layout.offsetX"
+                    t-att-y="layout.offsetY"
+                    t-att-width="layout.ancho"
+                    t-att-height="layout.largo"
+                    fill="#fff8f0"
+                    stroke="#ff8a3d"
+                    stroke-width="2"
+                    stroke-dasharray="6 4"
+                    rx="6"/>
+
+                <!-- 👇 PASILLOS -->
+                <g t-foreach="layout.pasillos" t-as="p" t-key="p.id">
+                    <rect
+                        t-att-x="p.x"
+                        t-att-y="p.y"
+                        t-att-width="p.w"
+                        t-att-height="p.h"
+                        fill="#cfe3ff"
+                        stroke="#7aa7e0"
+                        stroke-width="1"
+                        stroke-dasharray="3 3"
+                        rx="2"
+                        opacity="0.8"/>
+                    <text
+                        t-att-x="p.x + p.w / 2"
+                        t-att-y="p.y + p.h / 2"
+                        text-anchor="middle"
+                        dominant-baseline="middle"
+                        font-size="9"
+                        fill="#4f7cff"
+                        font-weight="700">
+                        PASILLO
+                    </text>
+                </g>
+
+                <!-- Etiqueta bodega -->
+                <text
+                    t-att-x="layout.offsetX + layout.ancho / 2"
+                    t-att-y="layout.offsetY - 10"
+                    text-anchor="middle"
+                    font-size="12"
+                    fill="#7a869a">
+                    Bodega: <t t-esc="props.anchoBodega"/> × <t t-esc="props.largoBodega"/> m
+                </text>
+
+                <!-- Racks -->
+                <g t-foreach="layout.racks" t-as="r" t-key="r.id">
+                    <rect
+                        t-att-x="r.x"
+                        t-att-y="r.y"
+                        t-att-width="r.w"
+                        t-att-height="r.h"
+                        rx="3"
+                        fill="none"
+                        stroke="#ff8a3d"
+                        stroke-width="1.5"
+                        opacity="0.9"/>
+                </g>
+            </svg>
+
+            <!-- Resumen -->
+            <div t-if="layout.valido" class="cc-croquis-legend">
+                <span><b t-esc="props.porAncho"/> × <b t-esc="props.porLargo"/> = <b t-esc="props.totalRacks"/> racks</span>
+                <span>Separación: <b t-esc="props.separacion"/> cm</span>
+            </div>
+        </div>
+    </t>
+
+</templates>

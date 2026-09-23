@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="rastreo_paquetes.pantalla_croquis">
+        <div class="o_creacion_croquis">
+
+            <!-- ═══════════════ HEADER ═══════════════ -->
+            <div class="cc-header">
+                <button class="cc-btn cc-btn-ghost" t-on-click="onClickRegresar">
+                    <i class="fa fa-arrow-left me-1"/> Regresar
+                </button>
+
+                <h2 class="cc-title">
+                    <i class="fa fa-cubes me-2"/> Creación de Croquis
+                </h2>
+
+                <button class="cc-btn cc-btn-warning" t-on-click="onClickCambiarEstado">
+                    <i class="fa fa-exchange me-1"/> Confirmar propuesta
+                </button>
+            </div>
+
+            <!-- ═══════════════ BODY 2 COLUMNAS ═══════════════ -->
+            <div class="cc-body">
+
+                <!-- ──────── COLUMNA IZQUIERDA: Formulario ──────── -->
+                <div class="cc-col-left">
+
+                    <!-- ▸ Cotización -->
+                    <div class="cc-card">
+                        <h3 class="cc-card-title">
+                            <span class="cc-badge-dot"></span>
+                            Cotización: <span class="cc-highlight"><t t-esc="state.pedido.id"/></span>
+                                    <button class="cc-btn cc-btn-primary cc-btn-sm"
+                                    t-on-click="onCalcular"
+                                    
+                                    >
+                                <i class="fa fa-refresh me-1"/> Recalcular
+                            </button>
+                        </h3>
+
+                        <div class="cc-field">
+                            <label class="cc-label">Elegir rack:</label>
+                            <select class="cc-select" t-model="state.rackTipo"  t-on-change="onRackChange">
+                                <option value="">— Selecciona un rack —</option>
+                                <t t-foreach="state.rackTipos" t-as="rack" t-key="rack_index">
+                                    <option t-att-value="rack_index" t-esc="rack[0]"/>
+                                </t>
+                            </select>
+                        </div>
+
+                        <div class="cc-field">
+                            <label class="cc-label">Elegir costo del rack:</label>
+                            <input type="number" class="cc-input"
+                                   placeholder="$0.00"
+                                   t-model="state.rackSeleccionadoCosto"
+                                   t-on-change = "onCalcular"
+                                   />
+                        </div>
+                    </div>
+
+                    <!-- ▸ Bodega -->
+                    <div class="cc-card">
+                        <h3 class="cc-card-title">
+                            <span class="cc-badge-dot"></span>
+                            Bodega
+                        </h3>
+
+                        <div class="cc-field">
+                            <label class="cc-label">Altura (Niveles):</label>
+                            <input type="number" class="cc-input"
+                                   placeholder="Niveles"
+                                   t-model="state.alturaBodega"
+                                   />
+                        </div>
+
+                        <div class="cc-field">
+                            <label class="cc-label">Ancho (M):</label>
+                            <input type="number" class="cc-input"
+                                   placeholder="m"
+                                   t-model="state.anchoBodega"
+                                   t-on-change="onCalcular"
+                                   />
+                        </div>
+
+                        <div class="cc-field">
+                            <label class="cc-label">Largo (M):</label>
+                            <input type="number" class="cc-input"
+                                   placeholder="m"
+                                   t-model="state.largoBodega"
+                                   t-on-change="onCalcular"
+                                   />
+                        </div>
+                           <!-- SVG con el croquis
+                        <div class="cc-card">
+                            <h3 class="cc-card-title">
+                                <span class="cc-badge-dot"></span>
+                                Pasillos
+                            </h3>
+
+                            <div class="cc-field">
+                                <label class="cc-label">Pasillos a lo ancho (X):</label>
+                                <input type="number" class="cc-input" min="0" step="1"
+                                    placeholder="0"
+                                    t-model.number="state.pasillosX"/>
+                            </div>
+
+                            <div class="cc-field">
+                                <label class="cc-label">Pasillos a lo largo (Y):</label>
+                                <input type="number" class="cc-input" min="0" step="1"
+                                    placeholder="0"
+                                    t-model.number="state.pasillosY"/>
+                            </div>
+
+                            <div class="cc-field">
+                                <label class="cc-label">Ancho del pasillo (m):</label>
+                                <input type="number" class="cc-input" min="0" step="0.1"
+                                    placeholder="2.0"
+                                    t-model.number="state.anchoPasillo"/>
+                            </div>
+                        </div>
+                            -->
+                        <div class="cc-field">
+                            <label class="cc-label">Comentarios:</label>
+                            <textarea class="cc-textarea"
+                                      rows="3"
+                                      placeholder="Notas sobre la bodega..."
+                                      t-model="state.comentarios"></textarea>
+                        </div>
+                        <div class="cc-field">
+                            <label class="cc-label">Ubicación de la bodega:</label>
+                            <textarea class="cc-textarea"
+                                      rows="3"
+                                      placeholder="Ubicación de la bodega..."
+                                      t-model="state.ubicacion"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ▸ Resultados -->
+                    <div class="cc-card cc-card-results">
+                        <h3 class="cc-card-title">
+                            <span class="cc-badge-dot cc-badge-accent"></span>
+                            Resultados
+                        </h3>
+
+                        <div class="cc-result-row">
+                            <span class="cc-result-label">Cantidad de Racks ocupados:</span>
+                            <span class="cc-result-value" t-esc="state.racksOcupados or 0"/>
+                        </div>
+
+                        <div class="cc-result-row">
+                            <span class="cc-result-label">Costo estimado:</span>
+                            <span class="cc-result-value" t-esc="state.costoEstimado or '$0.00'"/>
+                        </div>
+
+                        <div class="cc-result-row">
+                            <span class="cc-result-label">Almacenaje con rack por tonelada:</span>
+                            <span class="cc-result-value" t-esc="state.almacenajeTonelada or '$0.00'"/>
+                        </div>
+                    </div>
+
+                    <!-- ▸ Botón guardar -->
+                    <button class="cc-btn cc-btn-primary cc-btn-block"
+                            t-on-click="onClickGuardar"
+                            t-att-disabled="state.cargando">
+                        <t t-if="state.cargando">
+                            <i class="fa fa-spinner fa-spin me-1"/> Guardando...
+                        </t>
+                        <t t-else="">
+                            <i class="fa fa-save me-1"/> Guardar
+                        </t>
+                    </button>
+                </div>
+
+                <!-- ──────────────────────────────── COLUMNA DERECHA: Croquis ──────────────────────────────── -->
+                <div class="cc-col-right">
+                    <div class="cc-card cc-card-croquis">
+
+                        <div class="cc-croquis-header">
+                            <h3 class="cc-card-title mb-0">
+                                <span class="cc-badge-dot"></span>
+                                Croquis
+                            </h3>
+
+                            <button class="cc-btn cc-btn-success"
+                                    t-on-click="onClickDescargarPDF">
+                                <i class="fa fa-file-pdf-o me-1"/> Descargar en PDF
+                            </button>
+                        </div>
+
+                        <div class="cc-croquis-canvas">
+                            <CreacionCroquis
+                                anchoBodega="state.anchoBodega"
+                                largoBodega="state.largoBodega"
+                                alturaBodega="state.alturaBodega"
+                                separacion="state.separacion"
+                                anchoRack="state.anchoRack"
+                                largoRack="state.largoRack"
+                                porAncho="state.porAncho"
+                                porLargo="state.porLargo"
+                                totalRacks="state.racksOcupados"
+                                pasillosX="state.pasillosX"
+                                pasillosY="state.pasillosY"
+                                anchoPasillo="state.anchoPasillo"
+                            />
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </t>
+
+</templates>

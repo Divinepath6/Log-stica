@@ -1,0 +1,61 @@
+.cc-croquis {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 14px;
+    min-height: 0;
+}
+
+.cc-croquis-svg {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    display: block;
+    background:
+        linear-gradient(#f7f9ff 1px, transparent 1px) 0 0 / 100% 24px,
+        linear-gradient(90deg, #f7f9ff 1px, transparent 1px) 0 0 / 24px 100%,
+        #fdfdff;
+    border-radius: 12px;
+}
+
+.cc-croquis-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #9aa4b8;
+    border: 2px dashed #e3e7f0;
+    border-radius: 14px;
+    background: #fafbff;
+}
+
+.cc-croquis-empty i {
+    font-size: 2.6rem;
+    opacity: 0.55;
+}
+
+.cc-croquis-empty p {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.cc-croquis-legend {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    color: #7a869a;
+    padding: 0 6px;
+}
+
+.cc-croquis-legend b {
+    color: #4f7cff;
+}

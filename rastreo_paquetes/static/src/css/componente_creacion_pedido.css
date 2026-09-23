@@ -1,0 +1,106 @@
+.contenedor_busqueda {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.input_busqueda {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+}
+
+.input_busqueda:focus {
+    border-color: #875a7b;
+    box-shadow: 0 0 0 2px rgba(135, 90, 123, 0.2);
+}
+
+.boton_buscar {
+    padding: 8px 16px;
+    background-color: #875a7b;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.boton_buscar:hover {
+    background-color: #6c4762;
+}
+
+.lista_clientes {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.item_cliente {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.item_cliente:last-child {
+    border-bottom: none;
+}
+
+.item_cliente:hover {
+    background-color: #f5f0f4;
+}
+
+.item_cliente.seleccionado {
+    background-color: #875a7b;
+    color: #fff;
+}
+
+.nombre_cliente {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.mensaje_vacio {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    margin: 0;
+    font-style: italic;
+}
+
+.boton_cancelar {
+    padding: 8px 16px;
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.boton_cancelar:hover {
+    background-color: #cfcfcf;
+}
+
+.boton_confirmar {
+    padding: 8px 16px;
+    background-color: #875a7b;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.boton_confirmar:hover {
+    background-color: #6c4762;
+}
+
+.boton_confirmar:disabled {
+    background-color: #c9bfc6;
+    cursor: not-allowed;
+}

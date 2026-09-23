@@ -1,0 +1,361 @@
+.mi-boton-personalizado {
+    background-color: #52e6fd !important;   /* color Odoo */
+    color: #ffffff !important;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mi-boton-personalizado:hover {
+    background-color: #52ffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mi-boton-personalizado:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(3, 255, 196, 0.36);
+}
+
+.o_creacion_croquis {
+    /* ── Paleta ───────────────────────────── */
+    --cc-bg:        #f4f6fb;
+    --cc-card-bg:   #ffffff;
+    --cc-border:    #e3e7f0;
+    --cc-text:      #2c3548;
+    --cc-muted:     #7a869a;
+    --cc-primary:   #4f7cff;
+    --cc-primary-h: #3a63d8;
+    --cc-success:   #7ed957;
+    --cc-success-h: #65c142;
+    --cc-warning:   #ffc857;
+    --cc-warning-h: #f0b13a;
+    --cc-accent:    #ff8a3d;
+
+    background: var(--cc-bg);
+    min-height: 100vh;
+    padding: 24px;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--cc-text);
+
+    /* ═══ HEADER ═══ */
+    .cc-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+
+        .cc-title {
+            flex: 1;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--cc-text);
+        }
+    }
+
+    /* ═══ BODY ═══ */
+    .cc-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 20px;
+    align-items: start;
+
+    /* 👇 Altura fija = viewport - header - paddings */
+    height: calc(100vh - 160px);
+    min-height: 520px;
+
+    @media (max-width: 992px) {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+}
+
+    .cc-col-left,
+    .cc-col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;                /* 👈 menos separación entre cards */
+    min-width: 0;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;       /* espacio para la scrollbar */
+
+    /* Scrollbar delgada y discreta */
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #d6dce8;
+        border-radius: 8px;
+
+        &:hover { background: #b8c2d6; }
+    }
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #d6dce8 transparent;
+}
+
+    /* ═══ CARDS ═══ */
+    .cc-card {
+    background: var(--cc-card-bg);
+    border: 1px solid var(--cc-border);
+    border-radius: 14px;
+    padding: 12px 14px;       /* 👈 antes 20px 22px */
+    box-shadow: 0 2px 8px rgba(20, 30, 60, 0.04);
+    transition: box-shadow 0.2s ease;
+    flex-shrink: 0;           /* 👈 evita que se aplasten al scrollear */
+
+    &:hover {
+        box-shadow: 0 4px 14px rgba(20, 30, 60, 0.08);
+    }
+}
+
+.cc-card-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;        /* 👈 antes 14px */
+    color: var(--cc-text);
+}
+
+    .cc-badge-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--cc-primary);
+        display: inline-block;
+
+        &.cc-badge-accent { background: var(--cc-accent); }
+    }
+
+    .cc-highlight {
+        color: var(--cc-primary);
+        font-weight: 800;
+    }
+
+    /* ═══ FIELDS ═══ */
+    .cc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;                 /* 👈 antes 6px */
+    margin-bottom: 8px;       /* 👈 antes 12px */
+
+    &:last-child { margin-bottom: 0; }
+}
+
+    .cc-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--cc-muted);
+    }
+
+    .cc-input,
+.cc-select,
+.cc-textarea {
+    width: 100%;
+    padding: 6px 10px;        /* 👈 antes 9px 12px */
+    border: 1px solid var(--cc-border);
+    border-radius: 8px;
+    background: #fafbff;
+    font-size: 0.85rem;       /* 👈 un poco más chico */
+    color: var(--cc-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &:focus {
+        outline: none;
+        border-color: var(--cc-primary);
+        box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.15);
+        background: #fff;
+    }
+}
+
+.cc-textarea {
+    resize: vertical;
+    min-height: 54px;         /* 👈 antes 70px */
+    font-family: inherit;
+}
+
+    .cc-textarea {
+        resize: vertical;
+        min-height: 70px;
+        font-family: inherit;
+    }
+
+    /* ═══ RESULTADOS ═══ */
+    .cc-card-results {
+        background: linear-gradient(180deg, #fbfcff 0%, #f4f7ff 100%);
+    }
+
+    .cc-result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;           /* 👈 antes 8px */
+    border-bottom: 1px dashed var(--cc-border);
+
+    &:last-child { border-bottom: none; }
+}
+
+    .cc-result-label {
+        font-size: 0.85rem;
+        color: var(--cc-muted);
+    }
+
+    .cc-result-value {
+        font-weight: 700;
+        color: var(--cc-primary);
+        font-size: 0.95rem;
+    }
+    
+    /* ═══ BOTONES ═══ */
+    .cc-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 9px 18px;
+        border: none;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.1s, background 0.15s, box-shadow 0.15s;
+
+        &:active { transform: translateY(1px); }
+        &:disabled { opacity: 0.6; cursor: not-allowed; }
+    }
+
+    .cc-btn-primary {
+        background: var(--cc-primary);
+        color: #fff;
+        &:hover:not(:disabled) {
+            background: var(--cc-primary-h);
+            box-shadow: 0 4px 12px rgba(79, 124, 255, 0.35);
+        }
+    }
+
+    .cc-btn-success {
+        background: var(--cc-success);
+        color: #204a0f;
+        &:hover:not(:disabled) {
+            background: var(--cc-success-h);
+            box-shadow: 0 4px 12px rgba(126, 217, 87, 0.4);
+        }
+    }
+
+    .cc-btn-warning {
+        background: var(--cc-warning);
+        color: #5c4400;
+        &:hover:not(:disabled) {
+            background: var(--cc-warning-h);
+        }
+    }
+
+    .cc-btn-ghost {
+        background: #fff;
+        color: var(--cc-text);
+        border: 1px solid var(--cc-border);
+        &:hover:not(:disabled) {
+            background: #f4f6fb;
+            border-color: var(--cc-primary);
+            color: var(--cc-primary);
+        }
+    }
+
+    .cc-btn-block {
+        width: 100%;
+        padding: 9px;
+        font-size: 0.95rem;
+    }
+    .cc-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .cc-btn-sm {
+        padding: 5px 12px;
+        font-size: 0.78rem;
+        gap: 4px;
+    }
+
+    /* ═══ CROQUIS ═══ */
+    .cc-card-croquis {
+    display: flex;
+    flex-direction: column;
+    flex: 1;                  /* 👈 ocupa toda la altura disponible */
+    min-height: 0;            /* 👈 clave para que el hijo pueda crecer */
+
+    .cc-croquis-canvas {
+        flex: 1;
+        min-height: 0;        /* 👈 permite que se encoja si hace falta */
+    }
+}
+
+    .cc-croquis-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+
+    .cc-croquis-canvas {
+        flex: 1;
+        border-radius: 14px;
+        background:
+            linear-gradient(135deg, #ffb877 0%, #ff8a3d 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 380px;
+        overflow: hidden;
+        position: relative;
+
+        /* Trama sutil para que parezca canvas */
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+        }
+    }
+
+    .cc-croquis-placeholder {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.9);
+        position: relative;
+        z-index: 1;
+
+        i {
+            font-size: 3rem;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        p {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+    }
+}

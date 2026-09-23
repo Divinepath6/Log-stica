@@ -1,29 +1,38 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+import base64
+
 class rastreo_paquetes(models.Model):
     _name = 'rastreo.pedido'
     _description = 'Clase principal del modulo'
     #_inherit = ['mail.thread', 'mail.activity.mixin']
-    numero_guia = fields.Char(string='Número de guía')
+    numero_guia = fields.Char(string='Número de guía o cotización')
 
     estado = fields.Selection([
         ('fase_inicial', 'Fase inicial'),
         ('produccion', 'En Producción'),
-        ('forwarder', 'Sin forwarder'),
-        ('enviado', 'Enviado'),
-        ('entregado', 'Entregado'),
+        ('puerto_origen', 'En el puerto de origen'),
+        ('Embarcado', 'Embarcado'),
+        ('Descargado', 'Descargado'),
+        ('Aduana', 'En Aduana'),
         ('sin_pendiente', 'Sin Pendientes'),
     ], string = 'Estado', default='fase_inicial')
+
+    # FORWARDER ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
+    forwarder = fields.Boolean(
+        string="Forwarder conseguido", 
+        default=False
+    )
     pdf_BL = fields.Binary(
-            string='Documento PDF',
+            string='Documento BL',
             attachment=True
         )
     pdf_PL = fields.Binary(
-            string='Documento PDF',
+            string='Documento PL',
             attachment=True
         )
     pdf_invoice = fields.Binary(
-            string='Documento PDF',
+            string='Documento invoice',
             attachment=True
         )
 
@@ -33,90 +42,165 @@ class rastreo_paquetes(models.Model):
     destino = fields.Char(
         string='Destino'
     )
-    anticipo_dado = fields.Float(
-        string='Anticipo dado a proveedor'
-    )
-    anticipo_recibido = fields.Float(
-        string='Anticipo recibido de cliente'
+
+
+    currency_id = fields.Many2one(
+        'res.currency', 
+        string='Moneda', 
+        default=lambda self: self.env.company.currency_id
     )
 
-         
     ## Proveedor ----------------------------------------------------------------------------
     pdf_contrato_proveedor = fields.Binary(
-        string='Documento PDF',
+        string='Contrato con el proveedor',
         attachment=True
     )
     numero_contrato = fields.Char(
         string='Número de Guia'
     )
     pdf_factura_proveedor = fields.Binary(
-        string='Documento PDF',
+        string='Factura del proveedor',
         attachment=True
     )
-    
-    
+    total_proveedor = fields.Monetary(
+        string= 'Total acordado con el proveedor',
+        currency_field='currency_id' 
+    )
 
     ## Cliente ///////////////////////////////////////////////////////////////////////////////
-    total_cliente = fields.Char(
-        string= 'Total acordado con el cliente'
+    total_cliente = fields.Monetary(
+        string= 'Total acordado con el cliente',
+        currency_field='currency_id' 
     )
-    pdf_anticipo_cliente = fields.Binary(
-        string='Documento PDF',
-        attachment=True
+
+    anticipo_ids = fields.One2many(
+        'rastreo.anticipo_detalle', 
+        'pedido_id', 
+        string='Anticipos Recibidos'
     )
 
 
     ##LLave foranea para lo de clientes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    ##cliente_id = fields.Many2one(
-    ##    'CRM.cliente'
-    ##    'rastreo.cliente',
-    ##    string='Cliente'
-    ##)
+    cliente_id = fields.Many2one(
+        'res.partner',  
+        string='Cliente',  
+        required=True,  
+    )
 
 
-
-    ##LLave foranea para lo de las actualizaciones **************************************************
+    ##LLave foranea para lo de las actualizaciones y bodegas **************************************************
     actualizacion_ids = fields.One2many(
         'rastreo.pedido_actualizacion', 
         'pedido_id',                    
         string='Actualizaciones',
     )
-
+    bodegas_ids = fields.One2many(
+        'rastreo.bodega_cliente', 
+        'pedido_id',                    
+        string='Id de la bodega',
+    )
     # =============================================================================================================
     # MÉTODOS CRUD
     # =============================================================================================================
     @api.model
-    def crear_pedido(self, numero_guia):#cliente_id
-        if not numero_guia:
-            raise UserError("El número de guía es obligatorio")
+    def crear_pedido(self, cliente_id):#cliente_id
+        if not cliente_id:
+            raise UserError("El cliente es obligatorio")
+        cliente = self.env['res.partner'].browse(cliente_id)
+        if not cliente.exists():
+            raise UserError("El cliente indicado no existe")
+        
         pedido = self.create({
-            'numero_guia': numero_guia,
+            'cliente_id': cliente_id,
             'estado': 'fase_inicial',
         })
+
+        self.env['rastreo.pedido_actualizacion'].create({
+            'pedido_id': pedido.id,
+            'numero_actualizacion': 1,
+            'fecha_actualizacion': fields.Datetime.now(),
+            'actualizacion_texto': 'Fase inicial comenzada',
+        })
         
-        return {'id': pedido.id, 'numero_guia': pedido.numero_guia}
+        return {'id': pedido.id}
 
     
 
     @api.model
-    def cambiar_estado(self, pedido_id, estado):
+    def cambiar_estado(self, pedido_id, estado=None):
+        pedido = self.browse(pedido_id)
+        if not pedido.exists():
+            return {'success': False, 'error': 'Pedido no encontrado'}
+        siguiente_estado = estado
+            ### rellenaaaaaaaaaaaaaaaaaaaaaaaaaaaar cuando v
+        match pedido.estado:
+            case "fase_inicial":
+                siguiente_estado = 'produccion'
+                
+            case "produccion":
+                if not pedido.pdf_contrato_proveedor:
+                    return {'success': False, 'error': 'Falta el contrato del proveedor para continuar'}
+                siguiente_estado = 'puerto_origen'
+            case _:
+                if not siguiente_estado:
+                    return {'success': False, 'error': 'Estado no especificado'}
+
+        pedido.write({'estado': siguiente_estado})
+        return {
+            'success': True, 
+            'id': pedido.id, 
+            'nuevo_estado': siguiente_estado
+        }
+    ## PDFSSSS //////////////////////////////////////////////////
+    @api.model
+    def subir_pdf(self, nombre, archivo, pedido_id):
+
+        campos_permitidos = [
+            'pdf_contrato_proveedor',
+            'pdf_factura_proveedor',
+            'pdf_anticipo_cliente',
+            'pdf_BL',
+            'pdf_PL',
+            'pdf_invoice'
+        ]
+
+        if nombre not in campos_permitidos:
+            return {
+                'success': False,
+                'error': 'Campo de PDF no permitido'
+            }
+
         pedido = self.browse(pedido_id)
 
         if not pedido.exists():
-            return {'success': False, 'error': 'Pedido no encontrado'}
-        pedido.write({'estado': estado})       
-        return {'success': True, 'id': pedido.id}
- 
-    
-    @api.model
-    def subir_pdf(self,  nombre, archivo, pedido_id):
-        pedido = self.browse(pedido_id)
-    
-        if not pedido.exists():
-            return {'success': False, 'error': 'Pedido no encontrado'}
-        pedido.write({nombre: archivo})       
-        return {'success': True}
-    
+            return {
+                'success': False,
+                'error': 'Pedido no encontrado'
+            }
+
+        pedido.write({
+            nombre: archivo
+        })
+
+        field_obj = self._fields.get(nombre)
+        nombre_amigable = field_obj.string if field_obj else nombre
+        cantidad = self.env['rastreo.pedido_actualizacion'].search_count([
+            ('pedido_id', '=', pedido_id)
+        ])
+        numero = cantidad + 1
+        self.env['rastreo.pedido_actualizacion'].create({
+                'pedido_id': pedido.id,
+                'numero_actualizacion': numero,
+                'fecha_actualizacion': fields.Datetime.now(),
+                'actualizacion_texto': f'Archivo subido: {nombre_amigable}'
+            })
+        return {
+            'success': True
+        }
+
+
+
+
     @api.model
     def actualizar_pedido(self, pedido_id, nuevos_valores):
         pedido = self.browse(pedido_id)
@@ -142,35 +226,78 @@ class rastreo_paquetes(models.Model):
 
         if not pedido.exists():
             return {'success': False, 'error': 'Pedido no encontrado'}
-        
+
+        actualizaciones = self.env['rastreo.pedido_actualizacion'].search(
+            [('pedido_id', '=', pedido_id)],
+            order='fecha_actualizacion desc',
+        )
+        lista_actualizaciones = []
+
+        for actualizacion in actualizaciones:
+            lista_actualizaciones.append({
+                'id': actualizacion.id,
+                'numero_actualizacion': actualizacion.numero_actualizacion,
+                'fecha': actualizacion.fecha_actualizacion,
+                'texto': actualizacion.actualizacion_texto or '',
+            })
+
         return {
             'success': True,
             'data': {
                 'id': pedido.id,
                 'numero_guia': pedido.numero_guia or '',
-                'origen': pedido.origen or '',
-                'destino': pedido.destino or '',
                 'cliente_id': pedido.cliente_id.id if pedido.cliente_id else None,
                 'cliente_nombre': pedido.cliente_id.nombre if pedido.cliente_id else '',
-                
+                'total_cliente': pedido.total_cliente or 0,
+                'total_proveedor': pedido.total_proveedor or 0,
+                'numero_contrato': pedido.numero_contrato or 0,
+                'forwarder': pedido.forwarder,
                 # booleanos
                 'bool_contrato_proveedor': bool(pedido.pdf_contrato_proveedor),
                 'bool_factura_proveedor': bool(pedido.pdf_factura_proveedor),
                 
                 'numero_contrato': pedido.numero_contrato or '',
+                'actualizaciones': lista_actualizaciones,
             }
         }
 
     @api.model
-    def listar_pedidos(self, filtro_cliente=None):
-        domain = [('cliente_id', '=', filtro_cliente)] if filtro_cliente else []
+    def listar_pedidos(self, termino_busqueda=None):
+        domain = []
+        if termino_busqueda:
+            domain = [
+                '|',
+                ('numero_guia', 'ilike', termino_busqueda),
+                ('cliente_id.name', 'ilike', termino_busqueda),
+            ]
+
         pedidos = self.search(domain, limit=50)
+
+        pedido_ids = pedidos.ids
+        ultimas_por_pedido = {}
+        if pedido_ids:
+            actualizaciones = self.env['rastreo.pedido_actualizacion'].search_read(
+                [('pedido_id', 'in', pedido_ids)],
+                ['pedido_id', 'fecha_actualizacion', 'actualizacion_texto'],
+                order='fecha_actualizacion desc',
+            )
+            for a in actualizaciones:
+                pid = a['pedido_id'][0]
+                if pid not in ultimas_por_pedido:
+                    ultimas_por_pedido[pid] = a
+
         lista = []
         for p in pedidos:
+            ultima = ultimas_por_pedido.get(p.id)
             lista.append({
                 'id': p.id,
+                'cliente_nombre': p.cliente_id.name if p.cliente_id else '',
                 'estado': p.estado,
                 'numero_guia': p.numero_guia or '',
                 'bool_contrato_proveedor': bool(p.pdf_contrato_proveedor),
+                'ultima_actualizacion': {
+                    'fecha': ultima['fecha_actualizacion'] if ultima else '',
+                    'texto': ultima['actualizacion_texto'] if ultima else '',
+                },
             })
-        return lista
+        return lista    

@@ -1,0 +1,133 @@
+/* ================================
+   FORM PEDIDO - ESTILO PERSONALIZADO
+   ================================ */
+
+.o_rastreo_form .o_form_sheet_bg {
+    background: #f4f6f9;
+}
+
+.o_rastreo_form .o_form_sheet {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e3e8ef;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px;
+}
+
+/* Título - Número de Guía */
+.o_rastreo_form .oe_title h1 input {
+    font-weight: 700;
+    color: #7c5cbf;
+    border: none;
+    border-bottom: 2px dashed #7c5cbf33;
+    background: transparent;
+}
+
+.o_rastreo_form .oe_title h1 input:focus {
+    outline: none;
+    border-bottom-color: #7c5cbf;
+}
+
+.o_rastreo_form .oe_title label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #334155;
+}
+
+/* ================================
+   TARJETAS (Detalles / PDFs / Historial)
+   ================================ */
+
+.o_rastreo_form .o_rastreo_card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #7c5cbf;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+}
+
+.o_rastreo_form .o_rastreo_card_title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Separadores tipo "DETALLES DEL PEDIDO" */
+.o_rastreo_form .o_horizontal_separator {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+}
+
+/* ================================
+   BOTONES PDF (widget)
+   ================================ */
+
+.o_rastreo_form .o_field_widget[name="pdf_contrato_proveedor"],
+.o_rastreo_form .o_field_widget[name="pdf_factura_proveedor"] {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: border-color 0.2s ease;
+}
+
+.o_rastreo_form .o_field_widget[name="pdf_contrato_proveedor"]:hover,
+.o_rastreo_form .o_field_widget[name="pdf_factura_proveedor"]:hover {
+    border-color: #7c5cbf;
+}
+
+/* ================================
+   HISTORIAL (lista readonly)
+   ================================ */
+
+.o_rastreo_form .o_field_widget[name="actualizacion_ids"] .o_list_renderer {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.o_rastreo_form .o_field_widget[name="actualizacion_ids"] thead th {
+    background: #f1f5f9;
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 0.82rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.o_rastreo_form .o_field_widget[name="actualizacion_ids"] tbody tr:nth-child(even) {
+    background: #fafbfc;
+}
+
+.o_rastreo_form .o_field_widget[name="actualizacion_ids"] tbody tr:hover {
+    background: #f1f5f9;
+}
+
+.o_rastreo_form .btn-secondary {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+
+.o_rastreo_form .o_breadcrumb,
+.o_rastreo_form .breadcrumb,
+.o_rastreo_form .o_control_panel .breadcrumb {
+    display: none !important;
+}
+
+.o_form_view.o_rastreo_form .o_breadcrumb {
+    display: none !important;
+}

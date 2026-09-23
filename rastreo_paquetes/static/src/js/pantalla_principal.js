@@ -1,13 +1,17 @@
 /** @odoo-module **/
 import { registry } from "@web/core/registry";
-import { Component, onWillStart, useState  } from "@odoo/owl";
+import { Component, onWillStart, useState   } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks"; 
+import { componente_creacion_pedido } from "./componente_creacion_pedido";
 
 export class PantallaPrincipal extends Component { 
+    
+    static components = { componente_creacion_pedido };
     setup() {
         this.notification = useService("notification");
         this.action = useService("action");
         this.orm = useService("orm");
+        this.dialogService = useService("dialog");
         this.state = useState({
             pedidos: [],
             cargando: false,
@@ -16,44 +20,80 @@ export class PantallaPrincipal extends Component {
         onWillStart(async () => {
             await this.cargarPedidos();
         });
+        this.searchTimeout = null;
     }
     
     async onClickCrearPedido(ev) {
-       const id = await this.crearPedido();
-       console.log("creado con id: ", id);
+        this.dialogService.add(componente_creacion_pedido,  {
+                title: "Confirmación",
+                confirm: async (clienteId) => {
+                    const resultado = await this.crearPedido(clienteId)
+                    if(!resultado){
+                    }
+                    if(resultado[0] != 0){
+                        this.notification.add(
+                        `Exitoso `,
+                        { type: "success" }
+                    );
+                    }
+                },
+                cancel: () => {
+                    console.log("Cancelado");
+                }
+        });
     }
+       
     async onClickCargarPedidos(){
         await this.cargarPedidos();
     }
 
-    async onClickEditarPedido(id) {
-        await this.action.doAction({
-        type: "ir.actions.act_window",
-        res_model: "rastreo.pedido",
-        views: [[false, "form"]],
-        res_id: id,
-        target: "current",
-    });
-
+    async onClickEditarPedido(p) {
+        if(p.estado === 'fase_inicial'){
+            await this.action.doAction({
+                type: "ir.actions.client",
+                tag: "rastreo_paquetes.pantalla_croquis",
+                params: { pedido_id: p.id },  
+                target: "current",
+            });
+        }else{
+            await this.action.doAction({
+            type: "ir.actions.act_window",
+            res_model: "rastreo.pedido",
+            views: [[false, "form"]],
+            res_id: p.id,
+            target: "current",
+            });
+        }
+        
+    }
+    onBusqueda(ev){
+        const valorBuscado = ev.target.value;
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+        }
+        this.searchTimeout = setTimeout(() => {
+            this.cargarPedidos(valorBuscado);
+        }, 500);
     }
 
-    async crearPedido() {
-        const numeroGuia = "GUIA-001" ;
-        const ids = await this.orm.create("rastreo.pedido", [{
-            numero_guia: numeroGuia,
-            estado: "fase_inicial",
-        }]);
 
-        return ids[0];
+    async crearPedido(id) {
+        const resultado = await this.orm.call(
+            "rastreo.pedido", 
+            "crear_pedido",
+            [id]
+        );
+        await this.cargarPedidos();
+        return resultado[0];
     }
     
-    async cargarPedidos(filtroCliente = null) {
+    async cargarPedidos(filtro = null) {
         this.state.cargando = true;
         try {
             const pedidos = await this.orm.call(
                 "rastreo.pedido",
                 "listar_pedidos",
-                [filtroCliente]
+                [filtro]
             );
             this.state.pedidos = pedidos;
             this.asignarColumnas();
@@ -63,10 +103,18 @@ export class PantallaPrincipal extends Component {
     }
 
     asignarColumnas(){
-        const estados = ["fase_inicial", "produccion", "forwarder", "enviado", "entregado"];
+        const estados = 
+        [
+            ["fase_inicial", "Fase Inicial"], 
+            ["produccion", "En Producción"], 
+            ["forwarder", "A punto de salir a mar"], 
+            ["enviado", "En mar"],
+            ["entregado", "Finalizado"]
+
+        ];
         this.state.columns = estados.map(estado => ({
-            name: estado,
-            packages: this.state.pedidos.filter(p => p.estado === estado),
+            name: estado[1],
+            packages: this.state.pedidos.filter(p => p.estado === estado[0]),
         }));
     }
 }
