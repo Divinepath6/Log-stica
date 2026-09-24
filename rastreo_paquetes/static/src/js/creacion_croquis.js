@@ -1,7 +1,9 @@
 /** @odoo-module **/
 import { Component } from "@odoo/owl";
+//import { calcularLayoutCroquis } from "./funcion_calcular_layout";
 
 export class CreacionCroquis extends Component {
+    static components = { CreacionCroquis };
      setup() {
     }
 

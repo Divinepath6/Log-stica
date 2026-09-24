@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="report_croquis_bodega" model="ir.actions.report">
+        <field name="name">Croquis de Bodega</field>
+        <field name="model">rastreo.bodega_cliente</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rastreo_paquetes.report_croquis_bodega_doc</field>
+        <field name="report_file">rastreo_paquetes.report_croquis_bodega_doc</field>
+        <field name="print_report_name">'Croquis'</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <template id="report_croquis_bodega_doc">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2 style="text-align:center;">Cotización</h2>
+
+                    <p><b>Cliente:</b> <t t-esc="datos.get('clienteNombre', '')"/></p>
+                    <p><b>Ubicación:</b> <t t-esc="datos.get('ubicacion', '')"/></p>
+                    <p><b>Ancho de la bodega:</b> <t t-esc="datos.get('anchoBodega', '')"/> m</p>
+                    <p><b>Largo de la bodega:</b> <t t-esc="datos.get('largoBodega', '')"/> m</p>
+                    <p><b>Medidas Rack:</b> <t t-esc="datos.get('anchoRack', '')"/> ×
+                                            <t t-esc="datos.get('largoRack', '')"/> m</p>
+                    <p><b>Total de racks:</b> <t t-esc="datos.get('racksOcupados', '')"/></p>
+
+                    <t t-call="rastreo_paquetes.croquis_svg_doc"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="croquis_svg_doc">
+        <svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 800 500"
+            width="700"
+            height="440"
+            style="background:#fdfdff; display:block; margin: 10px auto;">
+
+            <rect
+                t-att-x="datos['layout']['offsetX']"
+                t-att-y="datos['layout']['offsetY']"
+                t-att-width="datos['layout']['ancho']"
+                t-att-height="datos['layout']['largo']"
+                fill="#fff8f0" stroke="#ff8a3d"
+                stroke-width="2" stroke-dasharray="6 4" rx="6"/>
+            <g t-foreach="datos['layout']['pasillos']" t-as="p" t-key="p['id']">
+                <rect t-att-x="p['x']" t-att-y="p['y']"
+                    t-att-width="p['w']" t-att-height="p['h']"
+                    fill="#cfe3ff" stroke="#7aa7e0"
+                    stroke-width="1" stroke-dasharray="3 3" rx="2" opacity="0.8"/>
+            </g>
+            <g t-foreach="datos['layout']['racks']" t-as="r" t-key="r['id']">
+                <rect t-att-x="r['x']" t-att-y="r['y']"
+                    t-att-width="r['w']" t-att-height="r['h']"
+                    rx="3" fill="none" stroke="#ff8a3d" stroke-width="1.5"/>
+            </g>
+        </svg>
+    </template>
+</odoo>

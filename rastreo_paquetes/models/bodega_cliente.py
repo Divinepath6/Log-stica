@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-
+import base64
+import json
 class rastreo_bodega_cliente(models.Model):
     _name = 'rastreo.bodega_cliente'
     _description = 'Clase para guardar la relacion entre bodegas'
@@ -105,15 +106,19 @@ class rastreo_bodega_cliente(models.Model):
                     'bodegas': bodegas_lista
                 }
         }
+    
     @api.model
     def generar_pdf_croquis(self, datos):
+        if isinstance(datos, str):
+            datos = json.loads(datos)
+
         pdf_content, _ = self.env['ir.actions.report']._render_qweb_pdf(
-            'rastreo_paquetes.report_croquis_bodega',
+            'rastreo_paquetes.report_croquis_bodega_doc', 
             res_ids=[],
             data={'datos': datos},
         )
         return {
-            'filename': 'croquis_bodega.pdf',
+            'filename': 'croquis_bodega_%s.pdf' % (datos.get('clienteNombre') or 'cliente'),
             'file_content': base64.b64encode(pdf_content).decode('utf-8'),
             'mimetype': 'application/pdf',
         }

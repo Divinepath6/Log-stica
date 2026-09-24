@@ -15,6 +15,7 @@
         'security/ir.model.access.csv',
         'views/views.xml',
         'views/pantalla_pedido.xml',
+        'reportes/creacion_croquis_reporte.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -22,11 +23,9 @@
             'rastreo_paquetes/static/src/xml/pantalla_principal.xml',
             'rastreo_paquetes/static/src/js/pantalla_principal.js',
 
-
             'rastreo_paquetes/static/src/js/pantalla_pedido.js',
             'rastreo_paquetes/static/src/xml/pantalla_pedido.xml',
             'rastreo_paquetes/static/src/css/pantalla_pedido.css',
-
 
             'rastreo_paquetes/static/src/xml/pantalla_croquis.xml',
             'rastreo_paquetes/static/src/js/pantalla_croquis.js',
@@ -39,6 +38,7 @@
             'rastreo_paquetes/static/src/js/componente_creacion_pedido.js',
             'rastreo_paquetes/static/src/css/componente_creacion_pedido.css',
             'rastreo_paquetes/static/src/xml/componente_creacion_pedido.xml',
+            'rastreo_paquetes/static/src/js/funcion_calcular_layout.js',
         ],
     },
     'installable': True,

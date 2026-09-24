@@ -16,7 +16,8 @@
             <field name="view_mode">form</field>
             <field name="context">{'no_breadcrumbs': True}</field>
         </record>
-        
+
+
         <menuitem id="menu_rastreo_paquetes_root" name="Logística"/>
         <menuitem id="menu_pantalla_principal"
                 name="Panel de Paquetes"

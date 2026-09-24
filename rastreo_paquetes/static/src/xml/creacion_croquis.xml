@@ -12,8 +12,6 @@
                 class="cc-croquis-svg"
                 viewBox="0 0 800 500"
                 preserveAspectRatio="xMidYMid meet">
-
-                <!-- Bodega -->
                 <rect
                     t-att-x="layout.offsetX"
                     t-att-y="layout.offsetY"
@@ -25,7 +23,6 @@
                     stroke-dasharray="6 4"
                     rx="6"/>
 
-                <!-- PASILLOS -->
                 <g t-foreach="layout.pasillos" t-as="p" t-key="p.id">
                     <rect
                         t-att-x="p.x"
@@ -50,7 +47,6 @@
                     </text>
                 </g>
 
-                <!-- Etiqueta bodega -->
                 <text
                     t-att-x="layout.offsetX + layout.ancho / 2"
                     t-att-y="layout.offsetY - 10"
@@ -60,7 +56,6 @@
                     Bodega: <t t-esc="props.anchoBodega"/> × <t t-esc="props.largoBodega"/> m
                 </text>
 
-                <!-- Racks -->
                 <g t-foreach="layout.racks" t-as="r" t-key="r.id">
                     <rect
                         t-att-x="r.x"
@@ -75,7 +70,6 @@
                 </g>
             </svg>
 
-            <!-- Resumen -->
             <div t-if="layout.valido" class="cc-croquis-legend">
                 <span><b t-esc="props.porAncho"/> × <b t-esc="props.porLargo"/> x <b t-esc="props.alturaBodega"/> = <b t-esc="props.totalRacks"/> racks</span>
                 <span>Separación: <b t-esc="props.separacion"/> cm</span>

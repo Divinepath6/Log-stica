@@ -5,6 +5,7 @@ import { useService } from "@web/core/utils/hooks";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { CreacionCroquis } from "./creacion_croquis";
+import { calcularLayoutCroquis } from "./funcion_calcular_layout";
 
 export class PantallaCroquis extends Component {
     static components = { CreacionCroquis };
@@ -15,32 +16,39 @@ export class PantallaCroquis extends Component {
         this.notification = useService("notification");
         this.dialogService = useService("dialog")
         this.state = useState({
+            // Valores "Generales"
             pedido: null,
             pedidoId: 0,
             nombre: "",
             cargando: false,
             separacion:15,
-            rackTipo: "",
             rackTipos: [],
-
-
+            bodegaIndex: 0,
+            bodegas: [],
+            clienteNombre: "",
             ubicacion: "",
-            pasillosX: 0,          
-            pasillosY: 0,          
+            // Valores "de la bodega"
+                  
             anchoPasillo: 2,   // metros
             rackSeleccionadomedidas: [],
+            rackSeleccionadoIndex: 0,
             rackSeleccionadoCosto: 0,
             alturaBodega: 1, // entero
             anchoBodega: 0, // metros
             largoBodega: 0, // metros
             comentarios: "",
             racksOcupados: 0,
+
+            // Valores "calculables"
+            pasillosX: 0,          
+            pasillosY: 0,    
+            anchoRack: 0,     // mm
+            largoRack: 0,  // mm
             costoEstimado: "$0.00",
             almacenajeTonelada: "$0.00",
-            anchoRack: 0,     // mm
-            largoRack: 0,     // mm
             porAncho: 0,      
-            porLargo: 0,   
+            porLargo: 0, 
+
             espacioSobranteVer: 0,
             espacioSobranteHor: 0, 
         });
@@ -51,21 +59,55 @@ export class PantallaCroquis extends Component {
                 this.state.pedidoId = pedidoId;
                 this.state.clienteNombre = clienteNombre;
                 await this.cargarRacks();
-                await this.cargarBodega();
+                await this.cargarBodegaDB();
             }
         });
         this.searchTimeout = null;
     }
-
-    async cargarRacks(){
-        const racks = 
-        [
-            ["Rack 1220 x 1220 x 1620", [1220 ,1220,1620], 122.65], 
-            ["Rack 1524 x 1424 x 1524", [1524 ,1424,1524], 153.60] 
-        ];
-        this.state.rackTipos = racks
+    //hechos para cargar y guardar en la lista de bodegas[] hechos para cargar y guardar en la lista de bodegas[]
+    cargarBodega(index){
+        const bodega = this.state.bodegas[index];
+        if (!bodega) return; 
+        this.state.rackSeleccionadoIndex = bodega.rackSeleccionadoIndex;
+        this.state.rackSeleccionadoCosto = bodega.rackSeleccionadoCosto;
+        this.state.alturaBodega = bodega.alturaBodega;
+        this.state.anchoBodega = bodega.anchoBodega;
+        this.state.largoBodega = bodega.largoBodega;
+        this.state.comentarios = bodega.comentarios
+        
     }
-    async cargarBodega(){
+    crearBodegaLista(){
+        const bodega = {
+            rackSeleccionadoIndex: 0,
+            rackSeleccionadoCosto: 0,
+            alturaBodega: 1, 
+            anchoBodega:0 ,
+            largoBodega: 0, 
+            comentarios: ""
+        };
+        this.state.bodegas.push(bodega);
+        this.state.bodegaIndex = this.state.bodegas.length; 
+    }
+    guardarBodega(){
+        const bodega ={
+            rackSeleccionadoIndex: this.state.rackSeleccionadoIndex,
+            rackSeleccionadoCosto: this.state.rackSeleccionadoCosto,
+            alturaBodega: this.state.alturaBodega, 
+            anchoBodega: this.state.anchoBodega, 
+            largoBodega: this.state.largoBodega, 
+            comentarios: this.state.comentarios
+        }
+        this.state.bodegas[this.state.bodegaIndex] = bodega;
+    }
+    onClickCrearBodega(){
+        this.guardarBodega(true)
+    }
+    onclickCambiarBodega(){
+        this.cargarBodega(0)
+    }
+     //hechos para cargar y guardar en la lista de bodegas[] hechos para cargar y guardar en la lista de bodegas[]
+    
+    async cargarBodegaDB(){
         try {
             const resultado = await this.orm.call(
                 "rastreo.bodega_cliente",
@@ -73,21 +115,35 @@ export class PantallaCroquis extends Component {
                 [this.state.pedidoId]
             );
             if(resultado.success){
-                    const bodega = resultado.data.bodegas[0];
-                    this.state.ubicacion = resultado.data.ubicacion;
-                    this.state.comentarios = bodega.descripcion;
-                    this.state.anchoBodega = bodega.ancho;
-                    this.state.largoBodega = bodega.largo;
-                    this.state.alturaBodega = bodega.niveles;
-                    this.state.rackTipo = bodega.rack_id;
-                    this.state.rackSeleccionadoCosto = bodega.costoRack;
-                    this.calcularRacks();
+                this.state.ubicacion = resultado.data.ubicacion;
+                const bodegas = resultado.data.bodegas
+                this.state.bodegas = bodegas.map( b => {
+                    return {
+                        rackSeleccionadoIndex: b.rack_id,
+                        rackSeleccionadoCosto:b.costoRack,
+                        alturaBodega:b.niveles,
+                        anchoBodega:b.ancho,
+                        largoBodega: b.largo,
+                        comentarios: b.descripcion
+                    }
+                });
+                this.state.rackSeleccionadoIndex = 0;
+                this.cargarBodega(0);
+                this.calcularRacks();
             }
         } finally {
             this.state.cargando = false;
         }
     }
-   
+    
+   async cargarRacks(){
+        const racks = 
+        [
+            ["Rack 1220 x 1220 x 1620", [1220 ,1220,1620], 122.65], 
+            ["Rack 1524 x 1424 x 1524", [1524 ,1424,1524], 153.60] 
+        ];
+        this.state.rackTipos = racks
+    }
 
     async onClickCambiarEstado(){
         this.dialogService.add(ConfirmationDialog, {
@@ -120,40 +176,8 @@ export class PantallaCroquis extends Component {
             this.state.cargando = false;
         }
     }
-    async onClickDescargarPDF() {
-    onClickGuardar();
-    const datos = {
-        anchoBodega:  this.state.anchoBodega,
-        largoBodega:  this.state.largoBodega,
-        alturaBodega: this.state.alturaBodega,
-        anchoRack:    this.state.anchoRack,
-        largoRack:    this.state.largoRack,
-        porAncho:     this.state.porAncho,
-        porLargo:     this.state.porLargo,
-        racksOcupados: this.state.racksOcupados,
-        costoEstimado: this.state.costoEstimado,
-        ubicacion:    this.state.ubicacion,
-        comentarios:  this.state.comentarios,
-        rackNombre:   this.state.rackTipos[this.state.rackTipo]?.[0] || '',
-        ...this.calcularLayoutParaPDF(),
-    };
 
-    const result = await this.orm.call(
-        "rastreo.bodega_cliente",
-        "generar_pdf_croquis",
-        [datos]
-    );
-
-    if (result?.file_content) {
-        const link = document.createElement('a');
-        link.href = `data:application/pdf;base64,${result.file_content}`;
-        link.download = result.filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
-}
-
+    
     onCalcular(){
         if (this.searchTimeout) {
             clearTimeout(this.searchTimeout);
@@ -164,7 +188,7 @@ export class PantallaCroquis extends Component {
     }
 
     calcularRacks() {
-        const idx = parseInt(this.state.rackTipo, 10);
+        const idx = parseInt(this.state.rackSeleccionadoIndex, 10);
         if (isNaN(idx)) {
             this.notification.add("Primero selecciona un rack", { type: "warning" });
             return;
@@ -189,13 +213,11 @@ export class PantallaCroquis extends Component {
             return;
         }
 
-        const anchoRackM = anchoRackmm / 1000;// m
-        const largoRackM  = largoRackmm / 1000; // m
+        const anchoRackM = anchoRackmm / 1000; // convercion de mm a m
+        const largoRackM  = largoRackmm / 1000; // convercion de mm a m
 
-        
-        const racksMathHor = ((anchoBodega - (separacionPared*2)) / (anchoRackM + separacionRack))+ separacionRack ;
-        const racksMathVer = ((largoBodega - (separacionPared*2)) / (largoRackM + separacionRack)) + separacionRack ;
-        
+        const racksMathHor = ((anchoBodega - (separacionPared*2)) / (anchoRackM + separacionRack))+ .16 ;
+        const racksMathVer = ((largoBodega - (separacionPared*2)) / (largoRackM + separacionRack)) + .16  ;
         const porAncho = Math.max(0, Math.floor( racksMathHor ));
         const porLargo = Math.max(0, Math.floor( racksMathVer ));
         
@@ -226,7 +248,7 @@ export class PantallaCroquis extends Component {
     }
 
     onRackChange() {
-        const idx = parseInt(this.state.rackTipo, 10);
+        const idx = parseInt(this.state.rackSeleccionadoIndex, 10);
         if (isNaN(idx)) {
             this.state.racksOcupados = 0;
             this.state.costoEstimado = "$0.00";
@@ -238,7 +260,7 @@ export class PantallaCroquis extends Component {
     }
     
     async onClickGuardar() {
-        const idx = parseInt(this.state.rackTipo, 10);
+        const idx = parseInt(this.state.rackSeleccionadoIndex, 10);
         const anchoBodega  = Number(this.state.anchoBodega) || 0;
         const largoBodega  = Number(this.state.largoBodega) || 0;
         let altoBodega   = Number(this.state.alturaBodega) || 1;
@@ -266,7 +288,7 @@ export class PantallaCroquis extends Component {
                 'ancho':            anchoBodega,
                 'largo':            largoBodega,
                 'niveles':          Math.round(altoBodega),
-                'rack_id':          this.state.rackTipo,
+                'rack_id':          this.state.rackSeleccionadoIndex,
                 'costoRack':        costo,
             }
         ]
@@ -283,7 +305,66 @@ export class PantallaCroquis extends Component {
             this.notification.add( `Guardado exitoso `, { type: "success" });
         }
     }
- 
+
+
+
+    // Descargar PDF ¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿
+    async onClickDescargarPDF() {
+        const layout = this.calcularLayoutParaPDF();
+        if (!layout.valido) {
+            this.notification.add("Genera primero el croquis", { type: "warning" });
+            return;
+        }
+        await this.onClickGuardar();
+        const datos = {
+            anchoBodega:  this.state.anchoBodega,
+            largoBodega:  this.state.largoBodega,
+            alturaBodega: this.state.alturaBodega,
+            anchoRack:    this.state.anchoRack,
+            largoRack:    this.state.largoRack,
+            porAncho:     this.state.porAncho,
+            porLargo:     this.state.porLargo,
+            racksOcupados: this.state.racksOcupados,
+            costoEstimado: this.state.costoEstimado,
+            ubicacion:    this.state.ubicacion,
+            comentarios:  this.state.comentarios,
+            rackNombre:   this.state.rackTipos[this.state.rackSeleccionadoIndex]?.[0] || '',
+            clienteNombre: this.state.clienteNombre || '',
+            layout,
+        };
+        this.notification.add("Generando PDF por favor espere ", { type: "success" });
+        const result = await this.orm.call(
+            "rastreo.bodega_cliente",
+            "generar_pdf_croquis",
+            [datos]
+        );
+
+        if (result?.file_content) {
+            const link = document.createElement('a');
+            link.href = `data:application/pdf;base64,${result.file_content}`;
+            link.download = result.filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }else{
+            this.notification.add("Error no se logro generar el PDF ", { type: "warning" });
+        }
+    }
+
+    calcularLayoutParaPDF() {
+        return calcularLayoutCroquis({
+            anchoBodega:  this.state.anchoBodega,
+            largoBodega:  this.state.largoBodega,
+            anchoRack:    this.state.anchoRack,
+            largoRack:    this.state.largoRack,
+            porAncho:     this.state.porAncho,
+            porLargo:     this.state.porLargo,
+            pasillosX:    this.state.pasillosX,
+            pasillosY:    this.state.pasillosY,
+            anchoPasillo: this.state.anchoPasillo,
+        });
+    }
+    
 }
 
 PantallaCroquis.template = "rastreo_paquetes.pantalla_croquis";
