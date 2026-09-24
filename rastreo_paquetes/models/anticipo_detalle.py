@@ -19,8 +19,9 @@ class rastreo_anticipo_detalle(models.Model):
         string='Fecha'
     ) 
     cantidad = fields.Monetary(
-        string='Cantidad en '
-    )   
+        string='Cantidad en dolares '
+    )
+    
     pdf_anticipo_cliente = fields.Binary(
         string='Documento PDF',
         attachment=True

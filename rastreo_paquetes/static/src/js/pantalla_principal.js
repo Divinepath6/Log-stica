@@ -52,7 +52,7 @@ export class PantallaPrincipal extends Component {
             await this.action.doAction({
                 type: "ir.actions.client",
                 tag: "rastreo_paquetes.pantalla_croquis",
-                params: { pedido_id: p.id },  
+                params: { pedido_id: p.id , cliente_nombre : p.cliente_nombre },  
                 target: "current",
             });
         }else{

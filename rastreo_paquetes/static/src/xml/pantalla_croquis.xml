@@ -3,8 +3,6 @@
 
     <t t-name="rastreo_paquetes.pantalla_croquis">
         <div class="o_creacion_croquis">
-
-            <!-- ═══════════════ HEADER ═══════════════ -->
             <div class="cc-header">
                 <button class="cc-btn cc-btn-ghost" t-on-click="onClickRegresar">
                     <i class="fa fa-arrow-left me-1"/> Regresar
@@ -19,17 +17,12 @@
                 </button>
             </div>
 
-            <!-- ═══════════════ BODY 2 COLUMNAS ═══════════════ -->
             <div class="cc-body">
-
-                <!-- ──────── COLUMNA IZQUIERDA: Formulario ──────── -->
                 <div class="cc-col-left">
-
-                    <!-- ▸ Cotización -->
                     <div class="cc-card">
                         <h3 class="cc-card-title">
                             <span class="cc-badge-dot"></span>
-                            Cotización: <span class="cc-highlight"><t t-esc="state.pedido.id"/></span>
+                            Cotización: <span class="cc-highlight"><t t-esc="state.clienteNombre"/></span>
                                     <button class="cc-btn cc-btn-primary cc-btn-sm"
                                     t-on-click="onCalcular"
                                     
@@ -70,6 +63,7 @@
                             <input type="number" class="cc-input"
                                    placeholder="Niveles"
                                    t-model="state.alturaBodega"
+                                   t-on-change="onCalcular"
                                    />
                         </div>
 
@@ -153,12 +147,20 @@
                         </div>
 
                         <div class="cc-result-row">
+                            <span class="cc-result-label">Espacio Sobrante horizontalmente (M):</span>
+                            <span class="cc-result-value" t-esc="state.espacioSobranteHor or '0.00'"/>
+                        </div>
+                        <div class="cc-result-row">
+                            <span class="cc-result-label">Espacio Sobrante Verticalmente (M):</span>
+                            <span class="cc-result-value" t-esc="state.espacioSobranteVer or '0.00'"/>
+                        </div>
+
+                        <div class="cc-result-row">
                             <span class="cc-result-label">Almacenaje con rack por tonelada:</span>
                             <span class="cc-result-value" t-esc="state.almacenajeTonelada or '$0.00'"/>
                         </div>
                     </div>
 
-                    <!-- ▸ Botón guardar -->
                     <button class="cc-btn cc-btn-primary cc-btn-block"
                             t-on-click="onClickGuardar"
                             t-att-disabled="state.cargando">
@@ -171,7 +173,6 @@
                     </button>
                 </div>
 
-                <!-- ──────────────────────────────── COLUMNA DERECHA: Croquis ──────────────────────────────── -->
                 <div class="cc-col-right">
                     <div class="cc-card cc-card-croquis">
 

@@ -3,13 +3,11 @@
 
     <t t-name="rastreo_paquetes.creacion_croquis_embed">
         <div class="cc-croquis">
-            <!-- Estado vacío -->
             <div t-if="!layout.valido" class="cc-croquis-empty">
                 <i class="fa fa-cubes"/>
                 <p>Completa los datos y presiona <strong>Recalcular</strong></p>
             </div>
 
-            <!-- SVG con el croquis -->
             <svg t-else=""
                 class="cc-croquis-svg"
                 viewBox="0 0 800 500"
@@ -27,7 +25,7 @@
                     stroke-dasharray="6 4"
                     rx="6"/>
 
-                <!-- 👇 PASILLOS -->
+                <!-- PASILLOS -->
                 <g t-foreach="layout.pasillos" t-as="p" t-key="p.id">
                     <rect
                         t-att-x="p.x"
@@ -79,7 +77,7 @@
 
             <!-- Resumen -->
             <div t-if="layout.valido" class="cc-croquis-legend">
-                <span><b t-esc="props.porAncho"/> × <b t-esc="props.porLargo"/> = <b t-esc="props.totalRacks"/> racks</span>
+                <span><b t-esc="props.porAncho"/> × <b t-esc="props.porLargo"/> x <b t-esc="props.alturaBodega"/> = <b t-esc="props.totalRacks"/> racks</span>
                 <span>Separación: <b t-esc="props.separacion"/> cm</span>
             </div>
         </div>

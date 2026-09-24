@@ -105,3 +105,15 @@ class rastreo_bodega_cliente(models.Model):
                     'bodegas': bodegas_lista
                 }
         }
+    @api.model
+    def generar_pdf_croquis(self, datos):
+        pdf_content, _ = self.env['ir.actions.report']._render_qweb_pdf(
+            'rastreo_paquetes.report_croquis_bodega',
+            res_ids=[],
+            data={'datos': datos},
+        )
+        return {
+            'filename': 'croquis_bodega.pdf',
+            'file_content': base64.b64encode(pdf_content).decode('utf-8'),
+            'mimetype': 'application/pdf',
+        }

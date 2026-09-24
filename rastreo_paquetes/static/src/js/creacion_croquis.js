@@ -6,10 +6,10 @@ export class CreacionCroquis extends Component {
     }
 
     get layout() {
-        return this._calcularLayout();
+        return this.calcularLayout();
     }
 
-    _calcularLayout() {
+    calcularLayout() {
         const anchoBodega  = Number(this.props.anchoBodega) || 0;
         const largoBodega  = Number(this.props.largoBodega) || 0;
         const anchoRack    = Number(this.props.anchoRack)   || 0;
@@ -19,7 +19,7 @@ export class CreacionCroquis extends Component {
         const pasillosX    = parseInt(this.props.pasillosX) || 0;
         const pasillosY    = parseInt(this.props.pasillosY) || 0;
         const anchoPasillo = Number(this.props.anchoPasillo) || 0;
-
+        
         if (!anchoBodega || !largoBodega || !porAncho || !porLargo) {
             return { valido: false, ancho: 0, largo: 0, racks: [], pasillos: [] };
         }
@@ -77,8 +77,6 @@ export class CreacionCroquis extends Component {
                 }
                 cursorY += largoBloqueReal;
                 if (by < bloquesY - 1) {
-                    // Si hay pasillosY declarados → usamos anchoPasillo
-                    // Si NO → usamos el espacio sobrante central
                     cursorY += (pasillosY > 0)
                         ? anchoPasillo
                         : espacioPasilloY;
@@ -88,7 +86,6 @@ export class CreacionCroquis extends Component {
             if (bx < bloquesX - 1) cursorX += anchoPasillo;
         }
 
-        // ─── Pasillos ───
         const pasillos = [];
 
         let px = sepParedX;
@@ -111,9 +108,6 @@ export class CreacionCroquis extends Component {
         for (let by = 0; by < bloquesY; by++) {
             py += largoBloqueReal;
             if (by < bloquesY - 1) {
-                // Espesor del pasillo horizontal:
-                // - Si el usuario declaró pasillosY → anchoPasillo
-                // - Si no → usamos el sobrante central
                 const altoPasilloY = (pasillosY > 0)
                     ? anchoPasillo
                     : espacioPasilloY;

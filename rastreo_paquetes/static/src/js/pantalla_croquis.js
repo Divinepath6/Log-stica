@@ -23,6 +23,7 @@ export class PantallaCroquis extends Component {
             rackTipo: "",
             rackTipos: [],
 
+
             ubicacion: "",
             pasillosX: 0,          
             pasillosY: 0,          
@@ -39,17 +40,19 @@ export class PantallaCroquis extends Component {
             anchoRack: 0,     // mm
             largoRack: 0,     // mm
             porAncho: 0,      
-            porLargo: 0,    
+            porLargo: 0,   
+            espacioSobranteVer: 0,
+            espacioSobranteHor: 0, 
         });
         onWillStart(async () => {
             if (this.props.action && this.props.action.params) {
                 const pedidoId = this.props.action.params.pedido_id || null;
-                this.pedido =  await this.cargarPedido(pedidoId);
-                this.state.pedidoId = pedidoId
+                const clienteNombre = this.props.action.params.cliente_nombre || null;
+                this.state.pedidoId = pedidoId;
+                this.state.clienteNombre = clienteNombre;
                 await this.cargarRacks();
                 await this.cargarBodega();
             }
-            
         });
         this.searchTimeout = null;
     }
@@ -80,25 +83,11 @@ export class PantallaCroquis extends Component {
                     this.state.rackSeleccionadoCosto = bodega.costoRack;
                     this.calcularRacks();
             }
-
-        } finally {
-            this.state.cargando = false;
-        }
-
-    }
-    async cargarPedido(pedidoId){
-        try {
-            const resultado = await this.orm.call(
-                "rastreo.pedido",
-                "obtener_pedido",
-                [pedidoId]
-            );
-            this.state.pedido = resultado.data ?? resultado;
-
         } finally {
             this.state.cargando = false;
         }
     }
+   
 
     async onClickCambiarEstado(){
         this.dialogService.add(ConfirmationDialog, {
@@ -132,7 +121,39 @@ export class PantallaCroquis extends Component {
         }
     }
     async onClickDescargarPDF() {
+    onClickGuardar();
+    const datos = {
+        anchoBodega:  this.state.anchoBodega,
+        largoBodega:  this.state.largoBodega,
+        alturaBodega: this.state.alturaBodega,
+        anchoRack:    this.state.anchoRack,
+        largoRack:    this.state.largoRack,
+        porAncho:     this.state.porAncho,
+        porLargo:     this.state.porLargo,
+        racksOcupados: this.state.racksOcupados,
+        costoEstimado: this.state.costoEstimado,
+        ubicacion:    this.state.ubicacion,
+        comentarios:  this.state.comentarios,
+        rackNombre:   this.state.rackTipos[this.state.rackTipo]?.[0] || '',
+        ...this.calcularLayoutParaPDF(),
+    };
+
+    const result = await this.orm.call(
+        "rastreo.bodega_cliente",
+        "generar_pdf_croquis",
+        [datos]
+    );
+
+    if (result?.file_content) {
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${result.file_content}`;
+        link.download = result.filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
     }
+}
+
     onCalcular(){
         if (this.searchTimeout) {
             clearTimeout(this.searchTimeout);
@@ -167,14 +188,18 @@ export class PantallaCroquis extends Component {
             this.notification.add("Ingresa un costo", { type: "warning" });
             return;
         }
+
         const anchoRackM = anchoRackmm / 1000;// m
         const largoRackM  = largoRackmm / 1000; // m
-        console.log( " ancho " + anchoBodega + " largo " + largoBodega + " anchorack" + anchoRackM + " largo " + largoRackM)
-        const porAncho = Math.max(0, Math.floor( ((anchoBodega - (separacionPared*2)) / (anchoRackM + separacionRack))+ separacionRack ));
-        const porLargo = Math.max(0, Math.floor( ((largoBodega - (separacionPared*2)) / (largoRackM + separacionRack)) + separacionRack ));
-        
-        console.log( " ancho " + porAncho + " largo " + porLargo)
 
+        
+        const racksMathHor = ((anchoBodega - (separacionPared*2)) / (anchoRackM + separacionRack))+ separacionRack ;
+        const racksMathVer = ((largoBodega - (separacionPared*2)) / (largoRackM + separacionRack)) + separacionRack ;
+        
+        const porAncho = Math.max(0, Math.floor( racksMathHor ));
+        const porLargo = Math.max(0, Math.floor( racksMathVer ));
+        
+        
         if (porAncho === 0 || porLargo === 0) {
             this.notification.add(
                 "Con estas dimensiones y pasillos no cabe ningún rack.",
@@ -182,9 +207,12 @@ export class PantallaCroquis extends Component {
             );
             return;
         }
-
-        this.state.racksOcupados  = porAncho * porLargo;
-        this.state.costoEstimado  = `$${(costo * this.state.racksOcupados * altoBodega).toFixed(2)}`;
+        this.state.espacioSobranteHor = ((anchoBodega - (separacionPared*2) - ((anchoRackM + separacionRack) * porAncho)) + separacionRack ).toFixed(2);
+        if(this.state.espacioSobranteHor < 0){ this.state.espacioSobranteHor = 0.00}
+        this.state.espacioSobranteVer = ((largoBodega - (separacionPared*2) - ((largoRackM  + separacionRack) * porLargo)) + separacionRack ).toFixed(2);
+        if(this.state.espacioSobranteVer < 0){ this.state.espacioSobranteVer = 0.00}
+        this.state.racksOcupados  = porAncho * porLargo * altoBodega;
+        this.state.costoEstimado  = `$${(costo * this.state.racksOcupados).toFixed(2)}`;
 
         this.state.anchoRack      = anchoRackM;   // m
         this.state.largoRack      = largoRackM;   // m
@@ -213,7 +241,7 @@ export class PantallaCroquis extends Component {
         const idx = parseInt(this.state.rackTipo, 10);
         const anchoBodega  = Number(this.state.anchoBodega) || 0;
         const largoBodega  = Number(this.state.largoBodega) || 0;
-        const altoBodega   = Number(this.state.alturaBodega) || 1;
+        let altoBodega   = Number(this.state.alturaBodega) || 1;
         const costo        = Number(this.state.rackSeleccionadoCosto) || 0;
 
         if (isNaN(idx)) {

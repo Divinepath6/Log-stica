@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="report_croquis_bodega" model="ir.actions.report">
+        <field name="name">Croquis de Bodega</field>
+        <field name="model">rastreo.bodega_cliente</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rastreo_paquetes.report_croquis_bodega_doc</field>
+        <field name="report_file">rastreo_paquetes.report_croquis_bodega_doc</field>
+        <field name="print_report_name">'Croquis'</field>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <template id="report_croquis_bodega_doc">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 style="text-align:center;">Croquis de Bodega</h2>
+                        <p><b>Ubicación:</b> <t t-esc="datos.get('ubicacion', '')"/></p>
+                        <t t-call="rastreo_paquetes.croquis_svg_doc"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="croquis_svg_doc">
+        <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"
+             style="width:100%; background:#fdfdff;">
+            <rect
+                t-att-x="datos.get('offsetX', 40)"
+                t-att-y="datos.get('offsetY', 40)"
+                t-att-width="datos.get('anchoSVG')"
+                t-att-height="datos.get('largoSVG')"
+                fill="#fff8f0" stroke="#ff8a3d"
+                stroke-width="2" stroke-dasharray="6 4" rx="6"/>
+
+            <g t-foreach="datos.get('racks', [])" t-as="r">
+                <rect t-att-x="r['x']" t-att-y="r['y']"
+                      t-att-width="r['w']" t-att-height="r['h']"
+                      rx="3" fill="none" stroke="#ff8a3d" stroke-width="1.5"/>
+            </g>
+        </svg>
+    </template>
+
+</odoo>

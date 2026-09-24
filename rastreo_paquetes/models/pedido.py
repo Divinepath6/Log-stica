@@ -36,14 +36,7 @@ class rastreo_paquetes(models.Model):
             attachment=True
         )
 
-    origen = fields.Char(
-        string='Origen'
-    )
-    destino = fields.Char(
-        string='Destino'
-    )
-
-
+  
     currency_id = fields.Many2one(
         'res.currency', 
         string='Moneda', 
@@ -72,7 +65,9 @@ class rastreo_paquetes(models.Model):
         string= 'Total acordado con el cliente',
         currency_field='currency_id' 
     )
-
+    racks_acordados = fields.Integer(
+        string = 'Total de rack acordados con el cliente'
+    )
     anticipo_ids = fields.One2many(
         'rastreo.anticipo_detalle', 
         'pedido_id', 
@@ -151,6 +146,7 @@ class rastreo_paquetes(models.Model):
             'id': pedido.id, 
             'nuevo_estado': siguiente_estado
         }
+
     ## PDFSSSS //////////////////////////////////////////////////
     @api.model
     def subir_pdf(self, nombre, archivo, pedido_id):
@@ -192,7 +188,7 @@ class rastreo_paquetes(models.Model):
                 'pedido_id': pedido.id,
                 'numero_actualizacion': numero,
                 'fecha_actualizacion': fields.Datetime.now(),
-                'actualizacion_texto': f'Archivo subido: {nombre_amigable}'
+                'actualizacion_texto': f'Archivo subido: {nombre_amigable} - {self.env.user.name}'
             })
         return {
             'success': True
@@ -247,7 +243,7 @@ class rastreo_paquetes(models.Model):
                 'id': pedido.id,
                 'numero_guia': pedido.numero_guia or '',
                 'cliente_id': pedido.cliente_id.id if pedido.cliente_id else None,
-                'cliente_nombre': pedido.cliente_id.nombre if pedido.cliente_id else '',
+                'cliente_nombre': pedido.cliente_id.name if pedido.cliente_id else '',
                 'total_cliente': pedido.total_cliente or 0,
                 'total_proveedor': pedido.total_proveedor or 0,
                 'numero_contrato': pedido.numero_contrato or 0,
