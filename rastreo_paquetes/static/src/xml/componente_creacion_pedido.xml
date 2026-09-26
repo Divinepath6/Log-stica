@@ -2,33 +2,30 @@
 <templates xml:space="preserve">
     <t t-name="rastreo_paquetes.componente_creacion_pedido_embed">
         <Dialog title="'Seleccionar Cliente'" size="'md'">
-            <div class="contenedor_busqueda">
-                <input
-                    type="text"
-                    class="input_busqueda"
-                    placeholder="Buscar por nombre..."
-                    t-model="state.termino_busqueda"
-                    t-on-keydown="onKeyDown"
-                />
-                <button class="boton_buscar" t-on-click="onBuscar">
+            <div class="odoo-search-row">
+                <input type="text"
+                       class="odoo-input"
+                       placeholder="Buscar por nombre..."
+                       t-model="state.termino_busqueda"
+                       t-on-keydown="onKeyDown"/>
+                <button class="odoo-btn odoo-btn-primary" t-on-click="onBuscar">
                     Buscar
                 </button>
-            </div> 
+            </div>
 
-            <div class="lista_clientes">
+            <div class="odoo-list">
                 <t t-if="state.cargando">
-                    <p class="mensaje_vacio">Cargando...</p>
+                    <p class="odoo-list-empty">Cargando...</p>
                 </t>
                 <t t-elif="state.clientes.length === 0">
-                    <p class="mensaje_vacio">No se encontraron clientes.</p>
+                    <p class="odoo-list-empty">No se encontraron clientes.</p>
                 </t>
                 <t t-else="">
                     <t t-foreach="state.clientes" t-as="cliente" t-key="cliente.id">
-                        <div
-                            class="item_cliente"
-                            t-att-class="{ seleccionado: state.clienteSeleccionadoId === cliente.id }"
-                            t-on-click="() => this.onSeleccionarCliente(cliente)">
-                            <span class="nombre_cliente">
+                        <div class="odoo-list-item"
+                             t-att-class="{ selected: state.clienteSeleccionadoId === cliente.id }"
+                             t-on-click="() => this.onSeleccionarCliente(cliente)">
+                            <span class="odoo-list-item-name">
                                 <t t-esc="cliente.name"/>
                                 <t t-esc="cliente.city || ''"/>
                             </span>
@@ -36,19 +33,18 @@
                     </t>
                 </t>
             </div>
-            
+
             <t t-set-slot="footer">
-                <button class="boton_cancelar" t-on-click="_onCancel">
+                <button class="odoo-btn odoo-btn-secondary" t-on-click="_onCancel">
                     Cancelar
                 </button>
-                <button
-                    class="boton_confirmar"
-                    t-on-click="_onConfirm"
-                    t-att-disabled="state.clienteSeleccionadoId === 0"
-                >
+                <button class="odoo-btn odoo-btn-primary"
+                        t-on-click="_onConfirm"
+                        t-att-disabled="state.clienteSeleccionadoId === 0">
                     Confirmar
                 </button>
             </t>
+
         </Dialog>
     </t>
 </templates>

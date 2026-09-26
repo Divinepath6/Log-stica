@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
+
 <odoo>
+    
     <record id="report_croquis_bodega" model="ir.actions.report">
         <field name="name">Croquis de Bodega</field>
         <field name="model">rastreo.bodega_cliente</field>
@@ -12,48 +14,194 @@
 
     <template id="report_croquis_bodega_doc">
         <t t-call="web.html_container">
-            <t t-call="web.external_layout">
-                <div class="page">
-                    <h2 style="text-align:center;">Cotización</h2>
+            <meta charset="UTF-8"/>
+            <t t-set="o" t-value="None"/>
 
-                    <p><b>Cliente:</b> <t t-esc="datos.get('clienteNombre', '')"/></p>
-                    <p><b>Ubicación:</b> <t t-esc="datos.get('ubicacion', '')"/></p>
-                    <p><b>Ancho de la bodega:</b> <t t-esc="datos.get('anchoBodega', '')"/> m</p>
-                    <p><b>Largo de la bodega:</b> <t t-esc="datos.get('largoBodega', '')"/> m</p>
-                    <p><b>Medidas Rack:</b> <t t-esc="datos.get('anchoRack', '')"/> ×
-                                            <t t-esc="datos.get('largoRack', '')"/> m</p>
-                    <p><b>Total de racks:</b> <t t-esc="datos.get('racksOcupados', '')"/></p>
+                    <style>
+                        body, .page, table, h1, h2, p, td, b, span {
+                            font-family: "DejaVu Sans", "Segoe UI", Arial, sans-serif !important;
+                        }
+                        .page { margin-top: 0 !important; padding-top: 5mm !important; }
+                        main { padding-top: 0 !important; }
+                        body { margin-top: 0 !important; }
+                    </style>
 
-                    <t t-call="rastreo_paquetes.croquis_svg_doc"/>
+            <div class="page" style="page-break-after: always;">
+                <div class="content-principal">
+                    <div style="display: flex; justify-content: space-between;
+                                align-items: flex-start; margin-bottom: 14px;
+                                border-bottom: 2px solid #ff8a3d; padding-bottom: 8px;">
+                        <div>
+                            <img t-if="datos.get('logo_b64')"
+                                 t-att-src="'data:image/png;base64,' + datos['logo_b64']"
+                                 style="max-height: 60px;"/>
+                        </div>
+                        <div style="text-align: right;">
+                            <h1 style="margin: 0; font-size: 22px; color: #2c3548;">
+                                Cotizaci&#243;n
+                            </h1>
+                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #666;">
+                                Fecha: <t t-esc="datos.get('fecha', '')"/>
+                            </p>
+                        </div>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse;
+                                  margin-bottom: 12px; font-size: 11px;
+                                  border: 1px solid #e3e7f0;">
+                        <tr>
+                            <td style="padding: 5px 10px; background:#f8fafc; border-bottom: 1px solid #e3e7f0; width: 18%;">
+                                <b>Cliente</b>
+                            </td>
+                            <td style="padding: 5px 10px; border-bottom: 1px solid #e3e7f0;">
+                                <t t-esc="datos.get('clienteNombre', '')"/>
+                            </td>
+                            <td style="padding: 5px 10px; background:#f8fafc; border-bottom: 1px solid #e3e7f0; width: 18%;">
+                                <b>Ubicaci&#243;n</b>
+                            </td>
+                            <td style="padding: 5px 10px; border-bottom: 1px solid #e3e7f0;">
+                                <t t-esc="datos.get('ubicacion', '')"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 10px; background:#f8fafc;">
+                                <b>Total bodegas</b>
+                            </td>
+                            <td style="padding: 5px 10px;">
+                                <t t-esc="len(datos.get('bodegas', []))"/>
+                            </td>
+                            <td style="padding: 5px 10px; background:#f8fafc;">
+                                <b>Costo total estimado</b>
+                            </td>
+                            <td style="padding: 5px 10px; font-weight: 700; color: #4f7cff;">
+                                &#36;<t t-esc="datos.get('costoEstimadoTotal', '0.00')"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <t t-if="datos.get('bodegas') and len(datos['bodegas']) > 0">
+                        <t t-call="rastreo_paquetes.croquis_svg_bodega">
+                            <t t-set="bodega" t-value="datos['bodegas'][0]"/>
+                        </t>
+                    </t>
                 </div>
+            </div>
+
+            <t t-if="datos.get('bodegas') and len(datos['bodegas']) > 1">
+                <t t-foreach="datos['bodegas'][1:]" t-as="b">
+                    <div class="page" t-attf-style="page-break-after: #{'auto' if b_last else 'always'};">
+                        <div class="content-principal">
+                            <div style="display: flex; justify-content: space-between;
+                                        align-items: center; margin-bottom: 10px;
+                                        border-bottom: 1px solid #e3e7f0; padding-bottom: 5px;">
+                                <div style="font-size: 10px; color: #7a869a;">
+                                    <t t-esc="datos.get('clienteNombre', '')"/> 
+                                    <t t-esc="datos.get('ubicacion', '')"/>
+                                </div>
+                                <div style="font-size: 10px; color: #7a869a;">
+                                    Cotizaci&#243;n  <t t-esc="datos.get('fecha', '')"/>
+                                </div>
+                            </div>
+
+                            <t t-call="rastreo_paquetes.croquis_svg_bodega">
+                                <t t-set="bodega" t-value="b"/>
+                            </t>
+                        </div>
+                    </div>
+                </t>
             </t>
         </t>
     </template>
 
+    <template id="croquis_svg_bodega">
+        <h2 style="text-align:center; margin: 0 0 6px 0; font-size: 15px; color: #2c3548;">
+            Bodega #<t t-esc="bodega['numero_bodega']"/>
+        </h2>
+
+        <table style="width: 100%; border-collapse: collapse;
+                      font-size: 9px; border: 1px solid #e3e7f0;
+                      margin-bottom: 8px;">
+            <tr>
+                <td style="padding: 3px 6px; background:#f8fafc; border-bottom:1px solid #e3e7f0;">
+                    <b>Ancho</b>
+                </td>
+                <td style="padding: 3px 6px; border-bottom:1px solid #e3e7f0;">
+                    <t t-esc="bodega['anchoBodega']"/> m
+                </td>
+                <td style="padding: 3px 6px; background:#f8fafc; border-bottom:1px solid #e3e7f0;">
+                    <b>Largo</b>
+                </td>
+                <td style="padding: 3px 6px; border-bottom:1px solid #e3e7f0;">
+                    <t t-esc="bodega['largoBodega']"/> m
+                </td>
+                <td style="padding: 3px 6px; background:#f8fafc; border-bottom:1px solid #e3e7f0;">
+                    <b>Niveles</b>
+                </td>
+                <td style="padding: 3px 6px; border-bottom:1px solid #e3e7f0;">
+                    <t t-esc="bodega['alturaBodega']"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 3px 6px; background:#f8fafc;">
+                    <b>Rack</b>
+                </td>
+                <td style="padding: 3px 6px;">
+                    <t t-esc="bodega['rackNombre']"/>
+                </td>
+                <td style="padding: 3px 6px; background:#f8fafc;">
+                    <b>Racks (H x V)</b>
+                </td>
+                <td style="padding: 3px 6px;">
+                    <t t-esc="bodega['porAncho']"/> x <t t-esc="bodega['porLargo']"/>
+                </td>
+                <td style="padding: 3px 6px; background:#f8fafc;">
+                    <b>Total</b>
+                </td>
+                <td style="padding: 3px 6px; font-weight: 700;">
+                    <t t-esc="bodega['racksOcupados']"/> racks
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 3px 6px; background:#f8fafc;">
+                    <b>Costo por rack</b>
+                </td>
+                <td style="padding: 3px 6px;">
+                    &#36;<t t-esc="bodega['costoRack']"/>
+                </td>
+                <td style="padding: 3px 6px; background:#f8fafc;">
+                    <b>Costo estimado</b>
+                </td>
+                <td style="padding: 3px 6px; font-weight: 700; color: #4f7cff;">
+                    &#36;<t t-esc="bodega['costoEstimado']"/>
+                </td>
+                <td colspan="2" style="padding: 3px 6px;">
+                    <span t-if="bodega.get('descripcion')" style="font-size:8px; color:#666;">
+                        <i><t t-esc="bodega['descripcion']"/></i>
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+        <div style="text-align:center;">
+            <t t-call="rastreo_paquetes.croquis_svg_doc"/>
+        </div>
+    </template>
+
     <template id="croquis_svg_doc">
         <svg xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 800 500"
-            width="700"
-            height="440"
-            style="background:#fdfdff; display:block; margin: 10px auto;">
-
-            <rect
-                t-att-x="datos['layout']['offsetX']"
-                t-att-y="datos['layout']['offsetY']"
-                t-att-width="datos['layout']['ancho']"
-                t-att-height="datos['layout']['largo']"
-                fill="#fff8f0" stroke="#ff8a3d"
-                stroke-width="2" stroke-dasharray="6 4" rx="6"/>
-            <g t-foreach="datos['layout']['pasillos']" t-as="p" t-key="p['id']">
-                <rect t-att-x="p['x']" t-att-y="p['y']"
-                    t-att-width="p['w']" t-att-height="p['h']"
-                    fill="#cfe3ff" stroke="#7aa7e0"
-                    stroke-width="1" stroke-dasharray="3 3" rx="2" opacity="0.8"/>
+             t-att-viewBox="'0 0 ' + str(bodega['layout']['anchoSVG']) + ' ' + str(bodega['layout']['altoSVG'])"
+             style="width: 100%; height: 175mm; display:block; margin: 0 auto;"
+             preserveAspectRatio="xMidYMid meet">
+            <rect t-att-x="bodega['layout']['offsetX']" t-att-y="bodega['layout']['offsetY']"
+                  t-att-width="bodega['layout']['ancho']" t-att-height="bodega['layout']['largo']"
+                  fill="#fff8f0" stroke="#ff8a3d" stroke-width="2" stroke-dasharray="6 4" rx="6"/>
+            <g t-foreach="bodega['layout']['pasillos']" t-as="p" t-key="p['id']">
+                <rect t-att-x="p['x']" t-att-y="p['y']" t-att-width="p['w']" t-att-height="p['h']"
+                      fill="#cfe3ff" stroke="#7aa7e0" stroke-width="1" stroke-dasharray="3 3" rx="2" opacity="0.8"/>
             </g>
-            <g t-foreach="datos['layout']['racks']" t-as="r" t-key="r['id']">
-                <rect t-att-x="r['x']" t-att-y="r['y']"
-                    t-att-width="r['w']" t-att-height="r['h']"
-                    rx="3" fill="none" stroke="#ff8a3d" stroke-width="1.5"/>
+            <g t-foreach="bodega['layout']['racks']" t-as="r" t-key="r['id']">
+                <rect t-att-x="r['x']" t-att-y="r['y']" t-att-width="r['w']" t-att-height="r['h']"
+                      rx="3" fill="none" stroke="#ff8a3d" stroke-width="1.5"/>
             </g>
         </svg>
     </template>

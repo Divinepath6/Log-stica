@@ -1,39 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-
     <t t-name="rastreo_paquetes.pantalla_croquis">
         <div class="o_creacion_croquis">
             <div class="cc-header">
-                <button class="cc-btn cc-btn-ghost" t-on-click="onClickRegresar">
-                    <i class="fa fa-arrow-left me-1"/> Regresar
+                <button class="odoo-btn odoo-btn-ghost" t-on-click="onClickRegresar">
+                    <i class="fa fa-arrow-left"/> Regresar
                 </button>
 
                 <h2 class="cc-title">
-                    <i class="fa fa-cubes me-2"/> Creación de Croquis
+                    <i class="fa fa-cubes"/> Creación de Croquis
                 </h2>
 
-                <button class="cc-btn cc-btn-warning" t-on-click="onClickCambiarEstado">
-                    <i class="fa fa-exchange me-1"/> Confirmar propuesta
+                <button class="odoo-btn odoo-btn-warning" t-on-click="onClickCambiarEstado">
+                    <i class="fa fa-exchange"/> Confirmar propuesta
                 </button>
             </div>
-
+            <div class="odoo-tabs">
+                <t t-foreach="state.bodegas" t-as="bodega" t-key="bodega_index">
+                    <button class="odoo-tab"
+                            t-att-class="{ 'active': bodega_index === state.bodegaIndex }"
+                            t-on-click="() => this.onclickCambiarBodega(bodega_index)">
+                        <i class="fa fa-cubes"/>
+                        Bodega <t t-esc="bodega_index + 1"/>
+                        <span t-if="state.bodegas.length > 1"
+                              class="odoo-tab-close"
+                              t-on-click="(ev) => this.eliminarBodega(bodega_index, ev)">
+                            <i class="fa fa-times"/>
+                        </span>
+                    </button>
+                </t>
+                <button class="odoo-tab odoo-tab-add" t-on-click="() => this.onClickCrearBodega()">
+                    <i class="fa fa-plus"/> Añadir bodega
+                </button>
+            </div>
             <div class="cc-body">
+
                 <div class="cc-col-left">
+
                     <div class="cc-card">
                         <h3 class="cc-card-title">
                             <span class="cc-badge-dot"></span>
-                            Cotización: <span class="cc-highlight"><t t-esc="state.clienteNombre"/></span>
-                                    <button class="cc-btn cc-btn-primary cc-btn-sm"
-                                    t-on-click="onCalcular"
-                                    
-                                    >
-                                <i class="fa fa-refresh me-1"/> Recalcular
+                            Cotización: <span class="odoo-highlight"><t t-esc="state.clienteNombre"/></span>
+                            — Bodega <t t-esc="state.bodegaIndex + 1"/>
+                            <button class="odoo-btn odoo-btn-primary odoo-btn-sm"
+                                    t-on-click="onCalcular">
+                                <i class="fa fa-refresh"/> Recalcular
+                            </button>
+                            <button class="odoo-btn odoo-btn-primary odoo-btn-sm"
+                                    t-on-click="onClickGuardar">
+                                <i class="fa fa-save"/> Guardar
                             </button>
                         </h3>
 
-                        <div class="cc-field">
-                            <label class="cc-label">Elegir rack:</label>
-                            <select class="cc-select" t-model="state.rackSeleccionadoIndex"  t-on-change="onRackChange">
+                        <div class="odoo-field">
+                            <label class="odoo-label">Elegir rack:</label>
+                            <select class="odoo-select"
+                                    t-model="state.rackSeleccionadoIndex"
+                                    t-on-change="onRackChange">
                                 <option value="">— Selecciona un rack —</option>
                                 <t t-foreach="state.rackTipos" t-as="rack" t-key="rack_index">
                                     <option t-att-value="rack_index" t-esc="rack[0]"/>
@@ -41,140 +64,109 @@
                             </select>
                         </div>
 
-                        <div class="cc-field">
-                            <label class="cc-label">Elegir costo del rack:</label>
-                            <input type="number" class="cc-input"
+                        <div class="odoo-field">
+                            <label class="odoo-label">Elegir costo del rack:</label>
+                            <input type="number" class="odoo-input"
                                    placeholder="$0.00"
                                    t-model="state.rackSeleccionadoCosto"
-                                   t-on-change = "onCalcular"
-                                   />
+                                   t-on-change="onCalcular"/>
                         </div>
                     </div>
 
-                    <!-- ▸ Bodega -->
                     <div class="cc-card">
                         <h3 class="cc-card-title">
                             <span class="cc-badge-dot"></span>
                             Bodega
                         </h3>
 
-                        <div class="cc-field">
-                            <label class="cc-label">Altura (Niveles):</label>
-                            <input type="number" class="cc-input"
+                        <div class="odoo-field">
+                            <label class="odoo-label">Altura (Niveles):</label>
+                            <input type="number" class="odoo-input"
                                    placeholder="Niveles"
                                    t-model="state.alturaBodega"
-                                   t-on-change="onCalcular"
-                                   />
+                                   t-on-change="onCalcular"/>
                         </div>
 
-                        <div class="cc-field">
-                            <label class="cc-label">Ancho (M):</label>
-                            <input type="number" class="cc-input"
+                        <div class="odoo-field">
+                            <label class="odoo-label">Ancho (M):</label>
+                            <input type="number" class="odoo-input"
                                    placeholder="m"
                                    t-model="state.anchoBodega"
-                                   t-on-change="onCalcular"
-                                   />
+                                   t-on-change="onCalcular"/>
                         </div>
 
-                        <div class="cc-field">
-                            <label class="cc-label">Largo (M):</label>
-                            <input type="number" class="cc-input"
+                        <div class="odoo-field">
+                            <label class="odoo-label">Largo (M):</label>
+                            <input type="number" class="odoo-input"
                                    placeholder="m"
                                    t-model="state.largoBodega"
-                                   t-on-change="onCalcular"
-                                   />
+                                   t-on-change="onCalcular"/>
                         </div>
-                           <!-- SVG con el croquis
-                        <div class="cc-card">
-                            <h3 class="cc-card-title">
-                                <span class="cc-badge-dot"></span>
-                                Pasillos
-                            </h3>
 
-                            <div class="cc-field">
-                                <label class="cc-label">Pasillos a lo ancho (X):</label>
-                                <input type="number" class="cc-input" min="0" step="1"
-                                    placeholder="0"
-                                    t-model.number="state.pasillosX"/>
-                            </div>
-
-                            <div class="cc-field">
-                                <label class="cc-label">Pasillos a lo largo (Y):</label>
-                                <input type="number" class="cc-input" min="0" step="1"
-                                    placeholder="0"
-                                    t-model.number="state.pasillosY"/>
-                            </div>
-
-                            <div class="cc-field">
-                                <label class="cc-label">Ancho del pasillo (m):</label>
-                                <input type="number" class="cc-input" min="0" step="0.1"
-                                    placeholder="2.0"
-                                    t-model.number="state.anchoPasillo"/>
-                            </div>
-                        </div>
-                            -->
-                        <div class="cc-field">
-                            <label class="cc-label">Comentarios:</label>
-                            <textarea class="cc-textarea"
+                        <div class="odoo-field">
+                            <label class="odoo-label">Comentarios:</label>
+                            <textarea class="odoo-textarea"
                                       rows="3"
                                       placeholder="Notas sobre la bodega..."
                                       t-model="state.comentarios"></textarea>
                         </div>
-                        
                     </div>
+
                     <div class="cc-card">
                         <h3 class="cc-card-title">
                             <span class="cc-badge-dot"></span>
                             Otros Datos
                         </h3>
-                        <div class="cc-field">
-                            <label class="cc-label">Ubicación de la bodega:</label>
-                            <textarea class="cc-textarea"
+                        <div class="odoo-field">
+                            <label class="odoo-label">Ubicación de la bodega:</label>
+                            <textarea class="odoo-textarea"
                                       rows="3"
                                       placeholder="Ubicación de la bodega..."
                                       t-model="state.ubicacion"></textarea>
                         </div>
                     </div>
-                    <!-- ▸ Resultados -->
+
                     <div class="cc-card cc-card-results">
                         <h3 class="cc-card-title">
                             <span class="cc-badge-dot cc-badge-accent"></span>
                             Resultados
                         </h3>
 
-                        <div class="cc-result-row">
-                            <span class="cc-result-label">Cantidad de Racks ocupados:</span>
-                            <span class="cc-result-value" t-esc="state.racksOcupados or 0"/>
+                        <div class="odoo-result-row">
+                            <span class="odoo-result-label">Cantidad de Racks ocupados:</span>
+                            <span class="odoo-result-value" t-esc="state.racksOcupados or 0"/>
                         </div>
 
-                        <div class="cc-result-row">
-                            <span class="cc-result-label">Costo estimado:</span>
-                            <span class="cc-result-value" t-esc="state.costoEstimado or '$0.00'"/>
+                        <div class="odoo-result-row">
+                            <span class="odoo-result-label">Costo estimado:</span>
+                            <span class="odoo-result-value" t-esc="state.costoEstimado or '$0.00'"/>
                         </div>
 
-                        <div class="cc-result-row">
-                            <span class="cc-result-label">Espacio Sobrante horizontalmente (M):</span>
-                            <span class="cc-result-value" t-esc="state.espacioSobranteHor or '0.00'"/>
-                        </div>
-                        <div class="cc-result-row">
-                            <span class="cc-result-label">Espacio Sobrante Verticalmente (M):</span>
-                            <span class="cc-result-value" t-esc="state.espacioSobranteVer or '0.00'"/>
+                        <div class="odoo-result-row">
+                            <span class="odoo-result-label">Espacio Sobrante horizontalmente (M):</span>
+                            <span class="odoo-result-value" t-esc="state.espacioSobranteHor or '0.00'"/>
                         </div>
 
-                        <div class="cc-result-row">
-                            <span class="cc-result-label">Almacenaje con rack por tonelada:</span>
-                            <span class="cc-result-value" t-esc="state.almacenajeTonelada or '$0.00'"/>
+                        <div class="odoo-result-row">
+                            <span class="odoo-result-label">Espacio Sobrante Verticalmente (M):</span>
+                            <span class="odoo-result-value" t-esc="state.espacioSobranteVer or '0.00'"/>
+                        </div>
+
+                        <div class="odoo-result-row">
+                            <span class="odoo-result-label">Almacenaje con rack por tonelada:</span>
+                            <span class="odoo-result-value" t-esc="state.almacenajeTonelada or '$0.00'"/>
                         </div>
                     </div>
 
-                    <button class="cc-btn cc-btn-primary cc-btn-block"
+                    <!-- Botón guardar -->
+                    <button class="odoo-btn odoo-btn-primary odoo-btn-block"
                             t-on-click="onClickGuardar"
                             t-att-disabled="state.cargando">
                         <t t-if="state.cargando">
-                            <i class="fa fa-spinner fa-spin me-1"/> Guardando...
+                            <i class="fa fa-spinner fa-spin"/> Guardando...
                         </t>
                         <t t-else="">
-                            <i class="fa fa-save me-1"/> Guardar
+                            <i class="fa fa-save"/> Guardar
                         </t>
                     </button>
                 </div>
@@ -188,9 +180,9 @@
                                 Croquis
                             </h3>
 
-                            <button class="cc-btn cc-btn-success"
+                            <button class="odoo-btn odoo-btn-success"
                                     t-on-click="onClickDescargarPDF">
-                                <i class="fa fa-file-pdf-o me-1"/> Descargar en PDF
+                                <i class="fa fa-file-pdf-o"/> Descargar en PDF
                             </button>
                         </div>
 
@@ -210,12 +202,10 @@
                                 anchoPasillo="state.anchoPasillo"
                             />
                         </div>
-
                     </div>
                 </div>
 
             </div>
         </div>
     </t>
-
 </templates>

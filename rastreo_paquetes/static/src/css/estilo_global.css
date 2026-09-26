@@ -1,0 +1,501 @@
+/* ============================================================
+   ESTILOS GLOBALES - MÓDULO RASTREO
+   Paleta Odoo + componentes reutilizables
+   ============================================================ */
+
+:root {
+    --odoo-primary:        #875a7b;
+    --odoo-primary-hover:  #6c4762;
+    --odoo-primary-soft:   #cbceff;
+    --odoo-accent:         #7c5cbf;
+    --odoo-cyan:           #52e6fd;
+    --odoo-cyan-hover:     #52ffff;
+
+    --odoo-bg:             #f4f6f9;
+    --odoo-card-bg:        #ffffff;
+    --odoo-border:         #e3e8ef;
+    --odoo-border-soft:    #e2e8f0;
+
+    --odoo-text:           #2c3548;
+    --odoo-text-muted:     #7a869a;
+    --odoo-text-strong:    #1e293b;
+
+    --odoo-radius-sm:      6px;
+    --odoo-radius-md:      10px;
+    --odoo-radius-lg:      14px;
+
+    --odoo-shadow-sm:      0 1px 3px rgba(20, 30, 60, 0.06);
+    --odoo-shadow-md:      0 2px 8px rgba(20, 30, 60, 0.08);
+    --odoo-shadow-lg:      0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ============================================================
+   1. LAYOUT GENERAL DE PANTALLAS
+   ============================================================ */
+
+.odoo-screen {
+    background: var(--odoo-bg);
+    min-height: 100vh;
+    padding: 16px;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--odoo-text);
+}
+
+/* Contenedor con scroll horizontal para columnas (Kanban) */
+.odoo-screen-columns {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0;
+    height: calc(100vh - 160px);
+}
+
+/* Grid de dos columnas (formularios con panel lateral) */
+.odoo-screen-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 20px;
+    align-items: start;
+    height: calc(100vh - 160px);
+    min-height: 520px;
+}
+
+@media (max-width: 992px) {
+    .odoo-screen-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+}
+
+
+/* ============================================================
+   2. ENCABEZADO DE PANTALLA (con buscador)
+   ============================================================ */
+
+.odoo-screen-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 8px;
+    padding: 12px 15px;
+    background: var(--odoo-card-bg);
+    border-radius: var(--odoo-radius-md);
+    box-shadow: var(--odoo-shadow-sm);
+}
+
+.odoo-screen-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--odoo-text-strong);
+}
+
+.odoo-search-box {
+    position: relative;
+    flex: 1;
+    max-width: 450px;
+}
+
+.odoo-search-box .odoo-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 14px;
+}
+
+.odoo-search-input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    font-size: 14px;
+    color: #495057;
+    background-color: #f4f6f8;
+    border: 1px solid #e1e4e8;
+    border-radius: var(--odoo-radius-sm);
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.odoo-search-input:focus {
+    background-color: #fff;
+    border-color: var(--odoo-cyan);
+    box-shadow: 0 0 0 3px rgba(82, 230, 253, 0.2);
+}
+
+.odoo-search-input::placeholder {
+    color: #adb5bd;
+    opacity: 1;
+}
+
+
+/* ============================================================
+   3. TARJETAS (Cards)
+   ============================================================ */
+
+.odoo-card {
+    background: var(--odoo-card-bg);
+    border: 1px solid var(--odoo-border);
+    border-radius: var(--odoo-radius-lg);
+    padding: 16px 20px;
+    box-shadow: var(--odoo-shadow-md);
+    transition: box-shadow 0.2s ease;
+    margin-bottom: 16px;
+}
+
+.odoo-card:hover {
+    box-shadow: var(--odoo-shadow-lg);
+}
+
+/* Tarjeta con acento lateral (formularios) */
+.odoo-card-accent {
+    border-left: 4px solid var(--odoo-accent);
+    border-radius: var(--odoo-radius-md);
+    padding: 18px 22px;
+}
+
+.odoo-card-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: var(--odoo-text-strong);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--odoo-border-soft);
+}
+
+.odoo-card-title.uppercase {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+
+/* ============================================================
+   4. COLUMNAS (Kanban)
+   ============================================================ */
+
+.odoo-column {
+    flex: 0 0 300px;
+    background: var(--odoo-card-bg);
+    border-radius: 4px;
+    padding: 4px;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.odoo-column-header {
+    font-weight: bold;
+    padding: 5px;
+    background: var(--odoo-primary-soft);
+    border-radius: 5px;
+    margin-bottom: 6px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.odoo-column-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.odoo-column-card {
+    background: #fff;
+    padding: 6px 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   5. BOTONES
+   ============================================================ */
+
+/* Botón principal Odoo (morado) */
+.odoo-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border: none;
+    border-radius: var(--odoo-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.odoo-btn:active   { transform: translateY(1px); }
+.odoo-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.odoo-btn-primary {
+    background: var(--odoo-primary);
+    color: #fff;
+}
+.odoo-btn-primary:hover:not(:disabled) {
+    background: var(--odoo-primary-hover);
+    box-shadow: 0 4px 8px rgba(135, 90, 123, 0.25);
+}
+
+.odoo-btn-accent {
+    background: var(--odoo-accent);
+    color: #fff;
+}
+.odoo-btn-accent:hover:not(:disabled) {
+    background: #664aa3;
+}
+
+.odoo-btn-cyan {
+    background-color: var(--odoo-cyan);
+    color: #fff;
+}
+.odoo-btn-cyan:hover:not(:disabled) {
+    background-color: var(--odoo-cyan-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.odoo-btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+.odoo-btn-secondary:hover:not(:disabled) {
+    background: #cfcfcf;
+}
+
+.odoo-btn-ghost {
+    background: #fff;
+    color: var(--odoo-text);
+    border: 1px solid var(--odoo-border);
+}
+.odoo-btn-ghost:hover:not(:disabled) {
+    background: #f4f6fb;
+    border-color: var(--odoo-accent);
+    color: var(--odoo-accent);
+}
+
+.odoo-btn-block {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.95rem;
+}
+
+.odoo-btn-sm {
+    padding: 5px 12px;
+    font-size: 0.78rem;
+}
+
+
+/* ============================================================
+   6. CAMPOS DE FORMULARIO
+   ============================================================ */
+
+.odoo-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.odoo-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--odoo-text-muted);
+}
+
+.odoo-input,
+.odoo-select,
+.odoo-textarea {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--odoo-border);
+    border-radius: var(--odoo-radius-sm);
+    background: #fafbff;
+    font-size: 0.88rem;
+    color: var(--odoo-text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.odoo-input:focus,
+.odoo-select:focus,
+.odoo-textarea:focus {
+    outline: none;
+    border-color: var(--odoo-accent);
+    box-shadow: 0 0 0 3px rgba(124, 92, 191, 0.15);
+    background: #fff;
+}
+
+.odoo-textarea {
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+}
+
+
+/* ============================================================
+   7. LISTA DE CLIENTES / RESULTADOS (búsqueda)
+   ============================================================ */
+
+.odoo-search-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.odoo-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--odoo-border);
+    border-radius: var(--odoo-radius-sm);
+    background: #fff;
+}
+
+.odoo-list-item {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    font-size: 14px;
+}
+
+.odoo-list-item:last-child { border-bottom: none; }
+.odoo-list-item:hover      { background-color: #f5f0f4; }
+.odoo-list-item.selected   {
+    background-color: var(--odoo-primary);
+    color: #fff;
+}
+
+.odoo-list-empty {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    margin: 0;
+    font-style: italic;
+}
+
+
+/* ============================================================
+   8. FILAS DE RESULTADOS (label : valor)
+   ============================================================ */
+
+.odoo-result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--odoo-border);
+}
+.odoo-result-row:last-child { border-bottom: none; }
+
+.odoo-result-label {
+    font-size: 0.85rem;
+    color: var(--odoo-text-muted);
+}
+
+.odoo-result-value {
+    font-weight: 700;
+    color: var(--odoo-accent);
+    font-size: 0.95rem;
+}
+
+.odoo-highlight {
+    color: var(--odoo-accent);
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   9. TABS
+   ============================================================ */
+
+.odoo-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px;
+    margin-bottom: 16px;
+    background: var(--odoo-card-bg);
+    border: 1px solid var(--odoo-border);
+    border-radius: var(--odoo-radius-lg);
+    box-shadow: var(--odoo-shadow-md);
+    align-items: center;
+}
+
+.odoo-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: var(--odoo-radius-md);
+    background: transparent;
+    color: var(--odoo-text-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.odoo-tab:hover:not(.active):not(.add) {
+    background: #f4f6fb;
+    color: var(--odoo-text);
+}
+
+.odoo-tab.active {
+    background: var(--odoo-accent);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(124, 92, 191, 0.35);
+}
+
+.odoo-tab-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    border-radius: 50%;
+    color: var(--odoo-text-muted);
+    font-size: 0.7rem;
+    transition: all 0.15s ease;
+}
+.odoo-tab-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+.odoo-tab-add {
+    margin-left: auto;
+    background: #f4f6fb;
+    color: var(--odoo-accent);
+    border: 1px dashed var(--odoo-accent);
+}
+.odoo-tab-add:hover { background: rgba(124, 92, 191, 0.08); }
+
+
+/* ============================================================
+   10. SCROLLBAR PERSONALIZADA (para columnas largas)
+   ============================================================ */
+
+.odoo-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #d6dce8 transparent;
+}
+.odoo-scroll::-webkit-scrollbar        { width: 8px; }
+.odoo-scroll::-webkit-scrollbar-track  { background: transparent; }
+.odoo-scroll::-webkit-scrollbar-thumb  {
+    background: #d6dce8;
+    border-radius: 8px;
+}
+.odoo-scroll::-webkit-scrollbar-thumb:hover { background: #b8c2d6; }

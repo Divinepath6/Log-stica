@@ -1,45 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates>
     <t t-name="rastreo_paquetes.pantalla_principal">
-        <div class="rastreo-dashboard">
-            <div class="dashboard-header">
+        <div class="odoo-screen odoo-dashboard">
+
+            <div class="odoo-screen-header">
                 <h2>Logística</h2>
-                <div class="search-box">
-                    <i class="fa fa-search search-icon"/>
-                    <input type="text" 
-                        class="form-control-custom" 
-                        placeholder="Buscar por nombre de cliente o cotización..." 
-                        t-on-input="onBusqueda"/>
+
+                <div class="odoo-search-box">
+                    <i class="fa fa-search odoo-search-icon"/>
+                    <input type="text"
+                           class="odoo-search-input"
+                           placeholder="Buscar por nombre de cliente o cotización..."
+                           t-on-input="onBusqueda"/>
                 </div>
-                    <button type="button"
-                            class="btn mi-boton-personalizado"
-                            t-on-click="onClickCrearPedido">
-                            <i class="fa fa-star"/> Crear Pedido
-                    </button>
-                </div>
-            <div class="dashboard-columns">
-                <div class="column" t-foreach="state.columns" t-as="col" t-key="col.name">
-                    <div class="column-header">
+
+                <button type="button"
+                        class="odoo-btn odoo-btn-primary"
+                        t-on-click="onClickCrearPedido">
+                    <i class="fa fa-star"/> Crear Pedido
+                </button>
+            </div>
+
+            <div class="odoo-screen-columns">
+
+                <div class="odoo-column"
+                     t-foreach="state.columns"
+                     t-as="col"
+                     t-key="col.name">
+
+                    <div class="odoo-column-header">
                         <t t-esc="col.name"/>
                     </div>
-                    <div class="column-content">
-                        <div class="card" t-foreach="col.packages" t-as="p" t-key="p.id">
+
+                    <div class="odoo-column-content">
+
+                        <div class="odoo-column-card"
+                             t-foreach="col.packages"
+                             t-as="p"
+                             t-key="p.id">
+
                             <div class="card-body">
                                 <strong>Cotización: <t t-esc="p.numero_guia"/></strong>
                                 <strong>Cliente: <t t-esc="p.cliente_nombre || ''"/></strong>
                                 <div>ID: <t t-esc="p.id || 0"/></div>
                                 <div>Anticipo recibido de cliente: <t t-esc="p.anticipo_cliente || 0"/></div>
                                 <div>Anticipo dado a proveedor: <t t-esc="p.anticipo_proveedor || 0"/></div>
-                                <div>Ultima actualizacion: <t t-esc="p.ultima_actualizacion.fecha  || ''"/> <t t-esc="p.ultima_actualizacion.texto || ''"/> </div>
+                                <div>
+                                    Ultima actualizacion:
+                                    <t t-esc="p.ultima_actualizacion.fecha  || ''"/>
+                                    <t t-esc="p.ultima_actualizacion.texto || ''"/>
+                                </div>
                             </div>
+
                             <button type="button"
-                                        class="btn btn-sm btn-secondary mt-2"
-                                        t-on-click="() => this.onClickEditarPedido(p)">
-                                    <i class="fa fa-pencil"/> Editar
+                                    class="odoo-btn odoo-btn-primary odoo-btn-sm"
+                                    t-on-click="() => this.onClickEditarPedido(p)">
+                                <i class="fa fa-pencil"/> Editar
                             </button>
                         </div>
+
                     </div>
                 </div>
+
             </div>
         </div>
     </t>

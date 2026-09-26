@@ -1,0 +1,314 @@
+/* ============================================================
+   ESTILOS ESPECÍFICOS POR PANTALLA
+   ============================================================ */
+
+
+/* ============================================================
+   PANTALLA 1: DASHBOARD PRINCIPAL (columnas Kanban)
+   ============================================================ */
+
+.odoo-dashboard .odoo-screen-header {
+    margin-bottom: 5px;
+    padding: 5px;
+}
+
+
+/* ============================================================
+   PANTALLA 2: FORMULARIO DE PEDIDO (vista form Odoo)
+   ============================================================ */
+
+.o_rastreo_form .o_form_sheet_bg {
+    background: var(--odoo-bg);
+}
+
+.o_rastreo_form .o_form_sheet {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: var(--odoo-shadow-lg);
+    border: 1px solid var(--odoo-border);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px;
+}
+
+/* Título principal (N° de guía) */
+.o_rastreo_form .oe_title h1 input {
+    font-weight: 700;
+    color: var(--odoo-accent);
+    border: none;
+    border-bottom: 2px dashed rgba(124, 92, 191, 0.2);
+    background: transparent;
+}
+.o_rastreo_form .oe_title h1 input:focus {
+    outline: none;
+    border-bottom-color: var(--odoo-accent);
+}
+.o_rastreo_form .oe_title label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--odoo-text-strong);
+}
+
+/* Tarjetas dentro del form */
+.o_rastreo_form .o_rastreo_card {
+    background: #fff;
+    border: 1px solid var(--odoo-border-soft);
+    border-left: 4px solid var(--odoo-accent);
+    border-radius: var(--odoo-radius-md);
+    padding: 18px 22px;
+    margin-bottom: 20px;
+}
+
+.o_rastreo_form .o_rastreo_card_title,
+.o_rastreo_form .o_horizontal_separator {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--odoo-text-strong);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--odoo-border-soft);
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+}
+
+/* Widgets PDF */
+.o_rastreo_form .o_field_widget[name="pdf_contrato_proveedor"],
+.o_rastreo_form .o_field_widget[name="pdf_factura_proveedor"] {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: border-color 0.2s ease;
+}
+.o_rastreo_form .o_field_widget[name="pdf_contrato_proveedor"]:hover,
+.o_rastreo_form .o_field_widget[name="pdf_factura_proveedor"]:hover {
+    border-color: var(--odoo-accent);
+}
+
+/* Historial (lista readonly) */
+.o_rastreo_form .o_field_widget[name="actualizacion_ids"] .o_list_renderer {
+    border-radius: var(--odoo-radius-md);
+    overflow: hidden;
+    border: 1px solid var(--odoo-border-soft);
+}
+.o_rastreo_form .o_field_widget[name="actualizacion_ids"] thead th {
+    background: #f1f5f9;
+    color: var(--odoo-text-strong);
+    font-weight: 600;
+    font-size: 0.82rem;
+    border-bottom: 1px solid var(--odoo-border-soft);
+}
+.o_rastreo_form .o_field_widget[name="actualizacion_ids"] tbody tr:nth-child(even) {
+    background: #fafbfc;
+}
+.o_rastreo_form .o_field_widget[name="actualizacion_ids"] tbody tr:hover {
+    background: #f1f5f9;
+}
+
+.o_rastreo_form .btn-secondary { border-radius: 8px; font-weight: 500; }
+
+/* Ocultar breadcrumb */
+.o_rastreo_form .o_breadcrumb,
+.o_rastreo_form .breadcrumb,
+.o_rastreo_form .o_control_panel .breadcrumb,
+.o_form_view.o_rastreo_form .o_breadcrumb {
+    display: none !important;
+}
+
+
+/* ============================================================
+   PANTALLA 3: CREACIÓN DE CROQUIS
+   ============================================================ */
+
+.o_creacion_croquis {
+    background: var(--odoo-bg);
+    min-height: 100vh;
+    padding: 24px;
+    color: var(--odoo-text);
+}
+
+/* Cabecera con título centrado */
+.o_creacion_croquis .cc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.o_creacion_croquis .cc-title {
+    flex: 1;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--odoo-text);
+}
+
+/* Cuerpo: dos columnas con scroll independiente */
+.o_creacion_croquis .cc-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 20px;
+    align-items: start;
+    height: calc(100vh - 160px);
+    min-height: 520px;
+}
+@media (max-width: 992px) {
+    .o_creacion_croquis .cc-body {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+}
+
+.o_creacion_croquis .cc-col-left,
+.o_creacion_croquis .cc-col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #d6dce8 transparent;
+}
+.o_creacion_croquis .cc-col-left::-webkit-scrollbar,
+.o_creacion_croquis .cc-col-right::-webkit-scrollbar { width: 8px; }
+.o_creacion_croquis .cc-col-left::-webkit-scrollbar-thumb,
+.o_creacion_croquis .cc-col-right::-webkit-scrollbar-thumb {
+    background: #d6dce8;
+    border-radius: 8px;
+}
+
+/* Tarjetas más compactas dentro del croquis */
+.o_creacion_croquis .cc-card {
+    background: var(--odoo-card-bg);
+    border: 1px solid var(--odoo-border);
+    border-radius: var(--odoo-radius-lg);
+    padding: 12px 14px;
+    box-shadow: 0 2px 8px rgba(20, 30, 60, 0.04);
+    flex-shrink: 0;
+    transition: box-shadow 0.2s ease;
+}
+.o_creacion_croquis .cc-card:hover {
+    box-shadow: 0 4px 14px rgba(20, 30, 60, 0.08);
+}
+
+.o_creacion_croquis .cc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Tarjeta de croquis (ocupa el alto disponible) */
+.o_creacion_croquis .cc-card-croquis {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+.o_creacion_croquis .cc-croquis-canvas {
+    flex: 1;
+    min-height: 380px;
+    border-radius: var(--odoo-radius-lg);
+    background: linear-gradient(135deg, #ffb877 0%, #ff8a3d 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+.o_creacion_croquis .cc-croquis-canvas::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+}
+
+.o_creacion_croquis .cc-croquis-placeholder {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+}
+.o_creacion_croquis .cc-croquis-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+.o_creacion_croquis .cc-croquis-placeholder p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+
+/* ============================================================
+   PANTALLA 4: LIENZO DEL CROQUIS (SVG / vacío / leyenda)
+   ============================================================ */
+
+.cc-croquis {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: var(--odoo-radius-lg);
+    min-height: 0;
+}
+
+.cc-croquis-svg {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    display: block;
+    background:
+        linear-gradient(#f7f9ff 1px, transparent 1px) 0 0 / 100% 24px,
+        linear-gradient(90deg, #f7f9ff 1px, transparent 1px) 0 0 / 24px 100%,
+        #fdfdff;
+    border-radius: 12px;
+}
+
+.cc-croquis-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #9aa4b8;
+    border: 2px dashed var(--odoo-border);
+    border-radius: var(--odoo-radius-lg);
+    background: #fafbff;
+}
+.cc-croquis-empty i {
+    font-size: 2.6rem;
+    opacity: 0.55;
+}
+.cc-croquis-empty p {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.cc-croquis-legend {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    color: var(--odoo-text-muted);
+    padding: 0 6px;
+}
+.cc-croquis-legend b {
+    color: var(--odoo-accent);
+}

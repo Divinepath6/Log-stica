@@ -107,13 +107,20 @@ class rastreo_bodega_cliente(models.Model):
                 }
         }
     
+  
     @api.model
     def generar_pdf_croquis(self, datos):
-        if isinstance(datos, str):
-            datos = json.loads(datos)
+     
+        company = self.env.company
+        if company.logo:
+            logo_b64 = company.logo.decode('utf-8') if isinstance(company.logo, bytes) else company.logo
+        else:
+            logo_b64 = ''
+        datos['logo_b64'] = logo_b64
+        datos['base_url'] = self.env['ir.config_parameter'].sudo().get_param('web.base.url') or 'http://localhost:8069'
 
         pdf_content, _ = self.env['ir.actions.report']._render_qweb_pdf(
-            'rastreo_paquetes.report_croquis_bodega_doc', 
+            'rastreo_paquetes.report_croquis_bodega_doc',
             res_ids=[],
             data={'datos': datos},
         )

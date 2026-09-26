@@ -48,6 +48,8 @@ export class PantallaCroquis extends Component {
             almacenajeTonelada: "$0.00",
             porAncho: 0,      
             porLargo: 0, 
+            
+            costoEstimadoTotal: "$0.00",
 
             espacioSobranteVer: 0,
             espacioSobranteHor: 0, 
@@ -68,45 +70,49 @@ export class PantallaCroquis extends Component {
     cargarBodega(index){
         const bodega = this.state.bodegas[index];
         if (!bodega) return; 
+        this.state.bodegaIndex = index;    
         this.state.rackSeleccionadoIndex = bodega.rackSeleccionadoIndex;
         this.state.rackSeleccionadoCosto = bodega.rackSeleccionadoCosto;
         this.state.alturaBodega = bodega.alturaBodega;
         this.state.anchoBodega = bodega.anchoBodega;
         this.state.largoBodega = bodega.largoBodega;
         this.state.comentarios = bodega.comentarios
-        
+        this.calcularRacks();
     }
     crearBodegaLista(){
-        const bodega = {
+        this.guardarBodegaActual();
+        this.state.bodegas.push({
             rackSeleccionadoIndex: 0,
             rackSeleccionadoCosto: 0,
             alturaBodega: 1, 
             anchoBodega:0 ,
             largoBodega: 0, 
             comentarios: ""
-        };
-        this.state.bodegas.push(bodega);
-        this.state.bodegaIndex = this.state.bodegas.length; 
+        });
+        this.state.bodegaIndex = this.state.bodegas.length- 1; 
     }
-    guardarBodega(){
-        const bodega ={
+    
+    guardarBodegaActual(){
+        const bodega ={ 
             rackSeleccionadoIndex: this.state.rackSeleccionadoIndex,
             rackSeleccionadoCosto: this.state.rackSeleccionadoCosto,
             alturaBodega: this.state.alturaBodega, 
             anchoBodega: this.state.anchoBodega, 
             largoBodega: this.state.largoBodega, 
-            comentarios: this.state.comentarios
+            comentarios: this.state.comentarios,
         }
         this.state.bodegas[this.state.bodegaIndex] = bodega;
     }
     onClickCrearBodega(){
-        this.guardarBodega(true)
+        this.guardarBodegaActual();
+        this.crearBodegaLista();
     }
-    onclickCambiarBodega(){
-        this.cargarBodega(0)
-    }
+    onclickCambiarBodega(bodegaIndex){
+        this.guardarBodegaActual();
+        this.cargarBodega(bodegaIndex)
+    } 
+
      //hechos para cargar y guardar en la lista de bodegas[] hechos para cargar y guardar en la lista de bodegas[]
-    
     async cargarBodegaDB(){
         try {
             const resultado = await this.orm.call(
@@ -127,15 +133,40 @@ export class PantallaCroquis extends Component {
                         comentarios: b.descripcion
                     }
                 });
+                if (this.state.bodegas.length === 0) {
+                    this.state.bodegas.push({
+                        rackSeleccionadoIndex: 0,
+                        rackSeleccionadoCosto: 0,
+                        alturaBodega: 1,
+                        anchoBodega: 0,
+                        largoBodega: 0,
+                        comentarios: "",
+                    });
+                    return;
+                }
                 this.state.rackSeleccionadoIndex = 0;
                 this.cargarBodega(0);
-                this.calcularRacks();
             }
         } finally {
             this.state.cargando = false;
         }
     }
-    
+
+    eliminarBodega(index, ev) {
+        if (ev) ev.stopPropagation(); 
+
+        if (this.state.bodegas.length <= 1) {
+            this.notification.add("Debe haber al menos una bodega", { type: "warning" });
+            return;
+        }
+        this.state.bodegas.splice(index, 1);
+
+        if (this.state.bodegaIndex >= this.state.bodegas.length) {
+            this.state.bodegaIndex = this.state.bodegas.length - 1;
+        }
+        this.cargarBodega(this.state.bodegaIndex);
+    }
+
    async cargarRacks(){
         const racks = 
         [
@@ -150,6 +181,7 @@ export class PantallaCroquis extends Component {
             title: _t("¿Estás seguro?"),
             body: _t("El cliente acepto la propuesta? ¿Desea continuar?"),
             confirm: async () => {
+                await this.onClickGuardar()
                 await this.cambiarEstado();
                 await this.action.doAction("rastreo_paquetes.action_pantalla_principal");
             },
@@ -163,7 +195,7 @@ export class PantallaCroquis extends Component {
         await this.action.doAction("rastreo_paquetes.action_pantalla_principal");
     }
     async cambiarEstado(){
-         const pedidoId = this.state.pedido.id
+        const pedidoId = this.state.pedido.id
         try {
             const resultado = await this.orm.call(
                 "rastreo.pedido",
@@ -254,18 +286,21 @@ export class PantallaCroquis extends Component {
             this.state.costoEstimado = "$0.00";
             return;
         }
+        
         const [, , costo] = this.state.rackTipos[idx];
         this.state.rackSeleccionadoCosto = costo;
-        this.state.costoEstimado = `$${costo.toFixed(2)}`;
+        this.state.calcularRacks();
     }
-    
+    async autoGuardado(){
+        await onClickGuardar;
+    }
+
     async onClickGuardar() {
         const idx = parseInt(this.state.rackSeleccionadoIndex, 10);
         const anchoBodega  = Number(this.state.anchoBodega) || 0;
         const largoBodega  = Number(this.state.largoBodega) || 0;
         let altoBodega   = Number(this.state.alturaBodega) || 1;
         const costo        = Number(this.state.rackSeleccionadoCosto) || 0;
-
         if (isNaN(idx)) {
             this.notification.add("Selecciona un rack", { type: "warning" });
             return;
@@ -281,17 +316,17 @@ export class PantallaCroquis extends Component {
         if(altoBodega < 1){
             altoBodega = 1;
         }
-        const bodegas =[
-            {                
-                'descripcion':      this.state.comentarios,
-                'numero_bodega':    1,
-                'ancho':            anchoBodega,
-                'largo':            largoBodega,
-                'niveles':          Math.round(altoBodega),
-                'rack_id':          this.state.rackSeleccionadoIndex,
-                'costoRack':        costo,
-            }
-        ]
+        
+        const bodegas = this.state.bodegas.map((b, i) => ({
+            descripcion:  b.comentarios,
+            numero_bodega: i + 1,
+            ancho:        Number(b.anchoBodega) || 0,
+            largo:        Number(b.largoBodega) || 0,
+            niveles:      Math.max(1, Math.round(Number(b.alturaBodega) || 1)),
+            rack_id:      b.rackSeleccionadoIndex,
+            costoRack:    Number(b.rackSeleccionadoCosto) || 0,
+        }));
+
         const id = await this.orm.call(
             "rastreo.bodega_cliente", 
             "guardar_bodega",
@@ -306,33 +341,39 @@ export class PantallaCroquis extends Component {
         }
     }
 
-
+    
 
     // Descargar PDF ¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿
     async onClickDescargarPDF() {
-        const layout = this.calcularLayoutParaPDF();
-        if (!layout.valido) {
-            this.notification.add("Genera primero el croquis", { type: "warning" });
-            return;
+        for (let i = 0; i < this.state.bodegas.length; i++) {
+            const b = this.state.bodegas[i];
+            if (!Number(b.anchoBodega) || !Number(b.largoBodega)) {
+                this.notification.add(`Bodega ${i + 1}: faltan datos`, { type: "warning" });
+                return;
+            }
         }
+
+        this.guardarBodegaActual();
         await this.onClickGuardar();
+     
+        const { bodegas, costoEstimadoTotal } = this.convertirBodegasLista();
+    
+
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        const formattedToday = `${dd}/${mm}/${yyyy}`;
+
         const datos = {
-            anchoBodega:  this.state.anchoBodega,
-            largoBodega:  this.state.largoBodega,
-            alturaBodega: this.state.alturaBodega,
-            anchoRack:    this.state.anchoRack,
-            largoRack:    this.state.largoRack,
-            porAncho:     this.state.porAncho,
-            porLargo:     this.state.porLargo,
-            racksOcupados: this.state.racksOcupados,
-            costoEstimado: this.state.costoEstimado,
-            ubicacion:    this.state.ubicacion,
-            comentarios:  this.state.comentarios,
-            rackNombre:   this.state.rackTipos[this.state.rackSeleccionadoIndex]?.[0] || '',
+            bodegas: bodegas,                    
+            costoEstimadoTotal: costoEstimadoTotal,
+            ubicacion: this.state.ubicacion,
             clienteNombre: this.state.clienteNombre || '',
-            layout,
+            fecha: formattedToday,
         };
-        this.notification.add("Generando PDF por favor espere ", { type: "success" });
+        this.notification.add("Generando PDF, por favor espere...", { type: "info" });
+
         const result = await this.orm.call(
             "rastreo.bodega_cliente",
             "generar_pdf_croquis",
@@ -346,11 +387,80 @@ export class PantallaCroquis extends Component {
             document.body.appendChild(link);
             link.click();
             link.remove();
-        }else{
-            this.notification.add("Error no se logro generar el PDF ", { type: "warning" });
+        } else {
+            this.notification.add("Error: no se logró generar el PDF", { type: "warning" });
         }
     }
+    convertirBodegasLista() {
+        let costoEstimadoTotal = 0;
+        const bodegas = this.state.bodegas.map((b, i) => {
+            const idx = parseInt(b.rackSeleccionadoIndex, 10);
+            if (isNaN(idx) || !this.state.rackTipos[idx]) {
+                return null; 
+            }
 
+            const separacionPared = 0.30;
+            const separacionRack  = 0.15;
+            const anchoBodega     = Number(b.anchoBodega) || 0;
+            const largoBodega     = Number(b.largoBodega) || 0;
+            const altoBodega      = Number(b.alturaBodega) || 1;
+
+            const [nombreRack, medidas] = this.state.rackTipos[idx];
+            const [anchoRackmm, largoRackmm, altoRackmm] = medidas;
+
+            const anchoRackM = anchoRackmm / 1000;
+            const largoRackM = largoRackmm / 1000;
+
+            const racksMathHor = ((anchoBodega - separacionPared * 2) / (anchoRackM + separacionRack)) + 0.16;
+            const racksMathVer = ((largoBodega - separacionPared * 2) / (largoRackM + separacionRack)) + 0.16;
+            const porAncho       = Math.max(0, Math.floor(racksMathHor));
+            const porLargo       = Math.max(0, Math.floor(racksMathVer));
+            const racksOcupados  = porAncho * porLargo * altoBodega;
+
+            const costoRack   = Number(b.rackSeleccionadoCosto) || 0;
+            const costoBodega = costoRack * racksOcupados;
+            costoEstimadoTotal += costoBodega;
+
+            const layout = calcularLayoutCroquis({
+                anchoBodega:  anchoBodega,
+                largoBodega:  largoBodega,
+                anchoRack:    anchoRackM,
+                largoRack:    largoRackM,
+                porAncho:     porAncho,
+                porLargo:     porLargo,
+                pasillosX:    0,
+                pasillosY:    0,
+                anchoPasillo: this.state.anchoPasillo,
+            });
+
+            return {
+                anchoBodega:   anchoBodega,
+                largoBodega:   largoBodega,
+                alturaBodega:  altoBodega,
+                anchoRack:     anchoRackmm,
+                largoRack:     largoRackmm,
+                altoRack:      altoRackmm,
+
+                porAncho:      porAncho,
+                porLargo:      porLargo,
+                racksOcupados: racksOcupados,
+
+                costoRack:     costoRack,
+                costoEstimado: costoBodega.toFixed(2),
+
+                rackNombre:    nombreRack,
+                descripcion:   b.comentarios || "",
+                numero_bodega: i + 1,
+
+                layout:        layout,
+            };
+        }).filter(Boolean);  
+
+        return {
+            bodegas: bodegas,
+            costoEstimadoTotal: costoEstimadoTotal.toFixed(2),
+        };
+    }
     calcularLayoutParaPDF() {
         return calcularLayoutCroquis({
             anchoBodega:  this.state.anchoBodega,
