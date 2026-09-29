@@ -30,7 +30,7 @@ export class PantallaPrincipal extends Component {
                     const resultado = await this.crearPedido(clienteId)
                     if(!resultado){
                     }
-                    if(resultado[0] != 0){
+                    if(resultado != 0){
                         this.notification.add(
                         `Exitoso `,
                         { type: "success" }
@@ -84,7 +84,7 @@ export class PantallaPrincipal extends Component {
             [id]
         );
         await this.cargarPedidos();
-        return resultado[0];
+        return resultado.id;
     }
     
     async cargarPedidos(filtro = null) {

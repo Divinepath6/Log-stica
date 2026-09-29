@@ -134,18 +134,30 @@ export class PantallaCroquis extends Component {
                     }
                 });
                 if (this.state.bodegas.length === 0) {
-                    this.state.bodegas.push({
-                        rackSeleccionadoIndex: 0,
-                        rackSeleccionadoCosto: 0,
-                        alturaBodega: 1,
-                        anchoBodega: 0,
-                        largoBodega: 0,
-                        comentarios: "",
-                    });
-                    return;
-                }
-                this.state.rackSeleccionadoIndex = 0;
-                this.cargarBodega(0);
+                        this.state.bodegas.push({
+                            rackSeleccionadoIndex: 0,
+                            rackSeleccionadoCosto: 0,
+                            alturaBodega: 1, 
+                            anchoBodega:0 ,
+                            largoBodega: 0, 
+                            comentarios: ""
+                        });
+                        this.state.bodegaIndex = 0; 
+                    }
+                    this.cargarBodega(0);
+            }else{
+                if (this.state.bodegas.length === 0) {
+                        this.state.bodegas.push({
+                            rackSeleccionadoIndex: 0,
+                            rackSeleccionadoCosto: 0,
+                            alturaBodega: 1, 
+                            anchoBodega:0 ,
+                            largoBodega: 0, 
+                            comentarios: ""
+                        });
+                        this.state.bodegaIndex = 0; 
+                    }
+                    this.cargarBodega(0);
             }
         } finally {
             this.state.cargando = false;
@@ -158,7 +170,7 @@ export class PantallaCroquis extends Component {
         if (this.state.bodegas.length <= 1) {
             this.notification.add("Debe haber al menos una bodega", { type: "warning" });
             return;
-        }
+        } 
         this.state.bodegas.splice(index, 1);
 
         if (this.state.bodegaIndex >= this.state.bodegas.length) {
@@ -289,7 +301,7 @@ export class PantallaCroquis extends Component {
         
         const [, , costo] = this.state.rackTipos[idx];
         this.state.rackSeleccionadoCosto = costo;
-        this.state.calcularRacks();
+        this.calcularRacks();
     }
     async autoGuardado(){
         await onClickGuardar;

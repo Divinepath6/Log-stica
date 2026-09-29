@@ -14,7 +14,6 @@ export function calcularLayoutCroquis(props) {
     if (!anchoBodega || !largoBodega || !porAncho || !porLargo) {
         return { valido: false, ancho: 0, largo: 0, racks: [], pasillos: [] };
     }
-
     const SEP_PARED = 0.30;
     const SEP_RACK  = 0.15;
 
