@@ -29,7 +29,7 @@ export class PantallaCroquis extends Component {
             ubicacion: "",
             // Valores "de la bodega"
                   
-            anchoPasillo: 2,   // metros
+               // metros
             rackSeleccionadomedidas: [],
             rackSeleccionadoIndex: 0,
             rackSeleccionadoCosto: 0,
@@ -40,8 +40,11 @@ export class PantallaCroquis extends Component {
             racksOcupados: 0,
 
             // Valores "calculables"
-            pasillosX: 0,          
-            pasillosY: 0,    
+            anchoPasilloX: 0,
+            pasillosX: 0, 
+            anchoPasilloY: 0,         
+            pasillosY: 0,  
+
             anchoRack: 0,     // mm
             largoRack: 0,  // mm
             costoEstimado: "$0.00",
@@ -91,7 +94,9 @@ export class PantallaCroquis extends Component {
         });
         this.state.bodegaIndex = this.state.bodegas.length- 1; 
     }
-    
+
+
+    //hechos para cargar y guardar en la lista de bodegas[] hechos para cargar y guardar en la lista de bodegas[]
     guardarBodegaActual(){
         const bodega ={ 
             rackSeleccionadoIndex: this.state.rackSeleccionadoIndex,
@@ -103,17 +108,9 @@ export class PantallaCroquis extends Component {
         }
         this.state.bodegas[this.state.bodegaIndex] = bodega;
     }
-    onClickCrearBodega(){
-        this.guardarBodegaActual();
-        this.crearBodegaLista();
-    }
-    onclickCambiarBodega(bodegaIndex){
-        this.guardarBodegaActual();
-        this.cargarBodega(bodegaIndex)
-    } 
+  
 
-     //hechos para cargar y guardar en la lista de bodegas[] hechos para cargar y guardar en la lista de bodegas[]
-    async cargarBodegaDB(){
+     async cargarBodegaDB(){
         try {
             const resultado = await this.orm.call(
                 "rastreo.bodega_cliente",
@@ -193,6 +190,7 @@ export class PantallaCroquis extends Component {
             title: _t("¿Estás seguro?"),
             body: _t("El cliente acepto la propuesta? ¿Desea continuar?"),
             confirm: async () => {
+                this.guardarBodegaActual();
                 await this.onClickGuardar()
                 await this.cambiarEstado();
                 await this.action.doAction("rastreo_paquetes.action_pantalla_principal");
@@ -204,6 +202,8 @@ export class PantallaCroquis extends Component {
        
     }
     async onClickRegresar() {
+        this.guardarBodegaActual();
+        this.onClickGuardar();
         await this.action.doAction("rastreo_paquetes.action_pantalla_principal");
     }
     async cambiarEstado(){
@@ -221,7 +221,6 @@ export class PantallaCroquis extends Component {
         }
     }
 
-    
     onCalcular(){
         if (this.searchTimeout) {
             clearTimeout(this.searchTimeout);
@@ -256,16 +255,16 @@ export class PantallaCroquis extends Component {
             this.notification.add("Ingresa un costo", { type: "warning" });
             return;
         }
-
-        const anchoRackM = anchoRackmm / 1000; // convercion de mm a m
-        const largoRackM  = largoRackmm / 1000; // convercion de mm a m
+        // convercion de mm a m  convercion de mm a m
+        const anchoRackM = anchoRackmm / 1000; 
+        const largoRackM  = largoRackmm / 1000; 
 
         const racksMathHor = ((anchoBodega - (separacionPared*2)) / (anchoRackM + separacionRack))+ .16 ;
         const racksMathVer = ((largoBodega - (separacionPared*2)) / (largoRackM + separacionRack)) + .16  ;
         const porAncho = Math.max(0, Math.floor( racksMathHor ));
         const porLargo = Math.max(0, Math.floor( racksMathVer ));
         
-        
+      
         if (porAncho === 0 || porLargo === 0) {
             this.notification.add(
                 "Con estas dimensiones y pasillos no cabe ningún rack.",
@@ -273,18 +272,26 @@ export class PantallaCroquis extends Component {
             );
             return;
         }
-        this.state.espacioSobranteHor = ((anchoBodega - (separacionPared*2) - ((anchoRackM + separacionRack) * porAncho)) + separacionRack ).toFixed(2);
-        if(this.state.espacioSobranteHor < 0){ this.state.espacioSobranteHor = 0.00}
-        this.state.espacioSobranteVer = ((largoBodega - (separacionPared*2) - ((largoRackM  + separacionRack) * porLargo)) + separacionRack ).toFixed(2);
-        if(this.state.espacioSobranteVer < 0){ this.state.espacioSobranteVer = 0.00}
+
+
+        let espacioSobranteHor = (anchoBodega - (separacionPared*2) - ((anchoRackM + separacionRack) * porAncho)) + separacionRack ;
+        if(espacioSobranteHor < 0){ espacioSobranteHor = 0.00}
+        this.state.anchoPasilloY = espacioSobranteHor;
+        this.state.espacioSobranteHor = (espacioSobranteHor + .60).toFixed(2);
+
+
+        let espacioSobranteVer = (largoBodega - (separacionPared*2) - ((largoRackM  + separacionRack) * porLargo)) + separacionRack ;
+        if(espacioSobranteVer < 0){ espacioSobranteVer = 0.00}
+        this.state.anchoPasilloX = espacioSobranteVer;
+        this.state.espacioSobranteVer = (espacioSobranteVer + .60).toFixed(2);
+
+
         this.state.racksOcupados  = porAncho * porLargo * altoBodega;
         this.state.costoEstimado  = `$${(costo * this.state.racksOcupados).toFixed(2)}`;
-
         this.state.anchoRack      = anchoRackM;   // m
         this.state.largoRack      = largoRackM;   // m
         this.state.porAncho       = porAncho;
         this.state.porLargo       = porLargo;
-
         this.notification.add(
             `Cálculo actualizado: ${this.state.costoEstimado} (${this.state.racksOcupados} racks)`,
             { type: "success" }
@@ -337,7 +344,7 @@ export class PantallaCroquis extends Component {
             niveles:      Math.max(1, Math.round(Number(b.alturaBodega) || 1)),
             rack_id:      b.rackSeleccionadoIndex,
             costoRack:    Number(b.rackSeleccionadoCosto) || 0,
-        }));
+        })); 
 
         const id = await this.orm.call(
             "rastreo.bodega_cliente", 
@@ -440,9 +447,10 @@ export class PantallaCroquis extends Component {
                 largoRack:    largoRackM,
                 porAncho:     porAncho,
                 porLargo:     porLargo,
-                pasillosX:    0,
-                pasillosY:    0,
-                anchoPasillo: this.state.anchoPasillo,
+                pasillosX:    1,
+                pasillosY:    1,
+                anchoPasilloX: this.state.anchoPasilloX,
+                anchoPasilloY: this.state.anchoPasilloY
             });
 
             return {
@@ -483,10 +491,19 @@ export class PantallaCroquis extends Component {
             porLargo:     this.state.porLargo,
             pasillosX:    this.state.pasillosX,
             pasillosY:    this.state.pasillosY,
-            anchoPasillo: this.state.anchoPasillo,
+            anchoPasilloX: this.state.anchoPasilloX,
+            anchoPasilloY: this.state.anchoPasilloY
         });
     }
-    
+
+      onClickCrearBodega(){
+        this.guardarBodegaActual();
+        this.crearBodegaLista();
+    }
+    onclickCambiarBodega(bodegaIndex){
+        this.guardarBodegaActual();
+        this.cargarBodega(bodegaIndex)
+    } 
 }
 
 PantallaCroquis.template = "rastreo_paquetes.pantalla_croquis";

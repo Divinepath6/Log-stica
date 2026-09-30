@@ -15,6 +15,8 @@
         <field name="dpi">90</field>
     </record>
 
+
+
     <record id="report_croquis_bodega" model="ir.actions.report">
         <field name="name">Croquis de Bodega</field>
         <field name="model">rastreo.bodega_cliente</field>
@@ -26,8 +28,11 @@
         <field name="paperformat_id" ref="paperformat_croquis_bodega"/>
     </record>
 
+
+    
     <template id="report_croquis_bodega_doc">
         <t t-call="web.html_container">
+            <meta charset="utf-8"/>
             <t t-set="o" t-value="None"/>
             
             <style>
@@ -57,22 +62,22 @@
                     page-break-inside: avoid;
                 }
                 .plano-marco {
-                    border: none; /* Borde exterior eliminado */
-                    padding: 0; /* Sin padding para maximizar expansión */
+                    border: none;
+                    padding: 0;
                     background: none;
                     box-sizing: border-box;
                     width: 100%;
-                    height: 275mm; /* Expandido al máximo alto disponible en hoja A4 */
+                    height: 275mm;
                     display: flex;
-                    align-items: center;
-                    justify-content: center;
+                    /* Alineación hacia arriba y a la izquierda */
+                    align-items: flex-start;
+                    justify-content: flex-start;
                 }
-                /* SVG que ocupa todo el espacio disponible */
                 .croquis-svg-full {
                     width: 100%;
-                    height: auto;
+                    height: 100%; /* Forzamos a que intente usar el 100% de la altura */
                     display: block;
-                    margin: 0 auto;
+                    margin: 0; /* Quitamos el margen auto para pegar a la izquierda */
                 }
             </style>
 
@@ -82,10 +87,10 @@
                         <div>
                             <img t-if="datos.get('logo_b64')"
                                  t-att-src="'data:image/png;base64,' + datos['logo_b64']"
-                                 style="max-height: 35px;"/>
+                                 style="max-height: 34px;"/>
                         </div>
-                        <div style="text-align: right;">
-                            <h1 style="margin: 0; font-size: 14px; color: #2c3548;">
+                        <div style="text-align: left;">
+                            <h1 style="margin: 0; font-size: 13px; color: #000000 ;">
                                 Croquis para la propuesta
                             </h1>
                             <p style="margin: 0; font-size: 8px; color: #666;">
@@ -94,9 +99,9 @@
                         </div>
                     </div>
 
-                    <div style="font-size: 9px; margin-bottom: 2px; color: #555;">
+                    <div style="font-size: 9px; margin-bottom: 2px; color: #000000 ;">
                         <b>Cliente:</b> <t t-esc="datos.get('clienteNombre', '')"/> 
-                        <b>Ubicación:</b> <t t-esc="datos.get('ubicacion', '')"/>
+                        <b>Ubicaci&#243;n:</b> <t t-esc="datos.get('ubicacion', '')"/>
                     </div>
 
                     <t t-if="datos.get('bodegas') and len(datos['bodegas']) > 0">
@@ -112,11 +117,11 @@
                     <div class="page" t-attf-style="page-break-after: #{'auto' if b_last else 'always'};">
                         <div class="content-principal">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; border-bottom: 1px solid #e3e7f0; padding-bottom: 2px;">
-                                <div style="font-size: 8px; color: #7a869a;">
+                                <div style="font-size: 8px; color: #000000;">
                                     <t t-esc="datos.get('clienteNombre', '')"/>
                                     <t t-esc="datos.get('ubicacion', '')"/>
                                 </div>
-                                <div style="font-size: 8px; color: #7a869a;">
+                                <div style="font-size: 8px; color: #000000;">
                                     <t t-esc="datos.get('fecha', '')"/>
                                 </div>
                             </div>
@@ -133,12 +138,15 @@
 
     <template id="croquis_svg_bodega">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1px;">
-            <h2 style="margin: 0; font-size: 12px; color: #ffffff;">
+            <h2 style="margin: 0; font-size: 9px; color: #000000;">
                 Bodega #<t t-esc="bodega['numero_bodega']"/>
             </h2>
-            <div style="font-size: 9px; color: #555;">
+            <div style="font-size: 9px; color: #000000;">
                 Ancho: <b><t t-esc="bodega['anchoBodega']"/> m</b> 
                 Largo: <b><t t-esc="bodega['largoBodega']"/> m</b>
+            </div>
+            <div style="font-size: 9px; color: #000000;">
+                Rack: <b><t t-esc="bodega['rackNombre']"/> </b> 
             </div>
         </div>
 
@@ -157,29 +165,28 @@
         
         <svg xmlns="http://www.w3.org/2000/svg"
              t-att-viewBox="'%s %s %s %s' % (vb_x, vb_y, vb_w, vb_h)"
-             style="width: 100%; max-height: 100%; display:block; margin: 0 auto;"
-             preserveAspectRatio="xMidYMid meet">
+             class="croquis-svg-full"
+             preserveAspectRatio="xMinYMin meet">
             
             <rect t-att-x="bodega['layout']['offsetX']" 
                   t-att-y="bodega['layout']['offsetY']"
                   t-att-width="bodega['layout']['ancho']" 
                   t-att-height="bodega['layout']['largo']"
-                  fill="#ffffff" 
-                  stroke="none" 
-                  rx="8"/>
+                  fill="#FFEFE5" 
+                  stroke="#4A2500" 
+                  stroke-width="2"/>
              
             <g t-foreach="bodega['layout']['pasillos']" t-as="p" t-key="p['id']">
                 <rect t-att-x="p['x']" t-att-y="p['y']" 
                       t-att-width="p['w']" t-att-height="p['h']"
                       fill="#cfe3ff" stroke="#7aa7e0" 
                       stroke-width="1" stroke-dasharray="6 4" 
-                      rx="3" opacity="0.7"/>
+                      opacity="0.7"/>
             </g>
             
             <g t-foreach="bodega['layout']['racks']" t-as="r" t-key="r['id']">
                 <rect t-att-x="r['x']" t-att-y="r['y']" 
                       t-att-width="r['w']" t-att-height="r['h']"
-                      rx="4" 
                       fill="#ffffff" 
                       stroke="#ff8a3d" 
                       stroke-width="1"/> 

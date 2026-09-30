@@ -1,4 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    
+    <t t-name="rastreo_paquetes.componente_edicion_racks_embed">
+        <Dialog title="'Seleccionar Rack'" size="'md'">
+            <div class="odoo-search-row">
+                
+                <button class="odoo-btn odoo-btn-primary" t-on-click="onBuscar">
+                    Buscar
+                </button>
+            </div>
+
+            <div class="odoo-list">
+                <t t-if="state.cargando">
+                    <p class="odoo-list-empty">Cargando...</p>
+                </t>
+                <t t-elif="state.clientes.length === 0">
+                    <p class="odoo-list-empty">No se encontraron clientes.</p>
+                </t>
+                <t t-else="">
+                    <t t-foreach="state.clientes" t-as="cliente" t-key="cliente.id">
+                        <div class="odoo-list-item"
+                             t-att-class="{ selected: state.clienteSeleccionadoId === cliente.id }"
+                             t-on-click="() => this.onSeleccionarRack()">
+                            <span class="odoo-list-item-name">
+                                <t t-esc="cliente.name"/>
+                                <t t-esc="cliente.city || ''"/>
+                            </span>
+                        </div>
+                    </t>
+                </t>
+            </div>
+
+            <t t-set-slot="footer">
+                <button class="odoo-btn odoo-btn-primary"
+                        t-on-click="_onConfirm"
+                        >
+                    Salir
+                </button>
+            </t>
+
+        </Dialog>
+    </t>
 </templates>

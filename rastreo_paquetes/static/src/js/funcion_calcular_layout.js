@@ -7,39 +7,39 @@ export function calcularLayoutCroquis(props) {
     const largoRack    = Number(props.largoRack)   || 0;
     const porAncho     = Number(props.porAncho)    || 0;
     const porLargo     = Number(props.porLargo)    || 0;
-    const pasillosX    = parseInt(props.pasillosX) || 0;
-    const pasillosY    = parseInt(props.pasillosY) || 0;
-    const anchoPasillo = Number(props.anchoPasillo) || 0;
 
     if (!anchoBodega || !largoBodega || !porAncho || !porLargo) {
         return { valido: false, ancho: 0, largo: 0, racks: [], pasillos: [] };
     }
+
     const SEP_PARED = 0.30;
     const SEP_RACK  = 0.15;
+
+    const espacioOcupadoRacksX = (porAncho * anchoRack) + ((porAncho - 1) * SEP_RACK);
+    const espacioOcupadoRacksY = (porLargo * largoRack) + ((porLargo - 1) * SEP_RACK);
+ 
+    let anchoPasilloX = 0;
+    let anchoPasilloY = 0;
+    
+    if (porAncho > 1) {
+        anchoPasilloX = (anchoBodega - (2 * SEP_PARED)) - (espacioOcupadoRacksX - SEP_RACK);
+        if (anchoPasilloX < 0) anchoPasilloX = SEP_RACK; 
+    }
+
+    if (porLargo > 1) {
+        anchoPasilloY = (largoBodega - (2 * SEP_PARED)) - (espacioOcupadoRacksY - SEP_RACK);
+        if (anchoPasilloY < 0) anchoPasilloY = SEP_RACK; 
+    }
+
+    const racksIzq = Math.ceil(porAncho / 2);
+    const racksArr = Math.ceil(porLargo / 2);
 
     const anchoSVG = 800;
     const altoSVG  = 500;
     const padding  = 40;
 
-    const bloquesX = pasillosX + 1;
-    const bloquesY = pasillosY + 1;
-
-    const racksPorBloqueX = Math.max(1, Math.floor(porAncho / bloquesX));
-    const racksPorBloqueY = Math.max(1, Math.floor(porLargo / bloquesY));
-
-    const anchoBloqueReal = racksPorBloqueX * anchoRack + (racksPorBloqueX - 1) * SEP_RACK;
-    const largoBloqueReal = racksPorBloqueY * largoRack + (racksPorBloqueY - 1) * SEP_RACK;
-
-    const totalUsadoX = bloquesX * anchoBloqueReal + pasillosX * anchoPasillo;
-    const sepParedX   = Math.max(SEP_PARED, (anchoBodega - totalUsadoX) / 2);
-
-    const totalUsadoYSinPasillo = bloquesY * largoBloqueReal;
-    const espacioDisponibleY    = largoBodega - 2 * SEP_PARED;
-    const espacioPasilloY       = Math.max(0, espacioDisponibleY - totalUsadoYSinPasillo);
-    const sepParedY             = SEP_PARED;
-
-    const areaW  = anchoSVG - 2 * padding;
-    const areaH  = altoSVG  - 2 * padding;
+    const areaW  = anchoSVG - (2 * padding);
+    const areaH  = altoSVG  - (2 * padding);
     const escalaX = areaW / anchoBodega;
     const escalaY = areaH / largoBodega;
     const escala  = Math.min(escalaX, escalaY);
@@ -50,82 +50,61 @@ export function calcularLayoutCroquis(props) {
     const offsetY = padding + (areaH - largoDibujo) / 2;
 
     const racks = [];
-    let cursorX = sepParedX;
-    for (let bx = 0; bx < bloquesX; bx++) {
-        let cursorY = sepParedY;
-        for (let by = 0; by < bloquesY; by++) {
-            for (let i = 0; i < racksPorBloqueX; i++) {
-                for (let j = 0; j < racksPorBloqueY; j++) {
-                    const xm = cursorX + i * (anchoRack + SEP_RACK);
-                    const ym = cursorY + j * (largoRack + SEP_RACK);
-                    racks.push({
-                        id: `r-${bx}-${by}-${i}-${j}`,
-                        x: offsetX + xm * escala,
-                        y: offsetY + ym * escala,
-                        w: anchoRack * escala,
-                        h: largoRack  * escala,
-                    });
-                }
-            }
-            cursorY += largoBloqueReal;
-            if (by < bloquesY - 1) {
-                cursorY += (pasillosY > 0) ? anchoPasillo : espacioPasilloY;
-            }
+    
+    for (let i = 0; i < porAncho; i++) {
+        for (let j = 0; j < porLargo; j++) {
+            let sumPasilloX = (i >= racksIzq && porAncho > 1) ? (anchoPasilloX - SEP_RACK) : 0;
+            let sumPasilloY = (j >= racksArr && porLargo > 1) ? (anchoPasilloY - SEP_RACK) : 0;
+
+            const xm = SEP_PARED + (i * (anchoRack + SEP_RACK)) + sumPasilloX;
+            const ym = SEP_PARED + (j * (largoRack + SEP_RACK)) + sumPasilloY;
+
+            racks.push({
+                id: `r-${i}-${j}`,
+                x: offsetX + xm * escala,
+                y: offsetY + ym * escala,
+                w: anchoRack * escala,
+                h: largoRack * escala,
+            });
         }
-        cursorX += anchoBloqueReal;
-        if (bx < bloquesX - 1) cursorX += anchoPasillo;
     }
 
     const pasillos = [];
-    let px = sepParedX;
-    for (let bx = 0; bx < bloquesX; bx++) {
-        px += anchoBloqueReal;
-        if (bx < bloquesX - 1) {
-            pasillos.push({
-                id: `px-${bx}`,
-                x: offsetX + px * escala,
-                y: offsetY + sepParedY * escala,
-                w: anchoPasillo * escala,
-                h: (largoBodega - 2 * sepParedY) * escala,
-                orientacion: "vertical",
-            });
-            px += anchoPasillo;
-        }
+    
+    if (porAncho > 1) {
+        const px = SEP_PARED + (racksIzq * anchoRack) + ((racksIzq - 1) * SEP_RACK);
+        pasillos.push({
+            id: `px-central`,
+            x: offsetX + px * escala,
+            y: offsetY + SEP_PARED * escala,
+            w: anchoPasilloX * escala,
+            h: (largoBodega - (2 * SEP_PARED)) * escala,
+            orientacion: "vertical",
+        });
     }
 
-    let py = sepParedY;
-    for (let by = 0; by < bloquesY; by++) {
-        py += largoBloqueReal;
-        if (by < bloquesY - 1) {
-            const altoPasilloY = (pasillosY > 0) ? anchoPasillo : espacioPasilloY;
-            pasillos.push({
-                id: `py-${by}`,
-                x: offsetX + sepParedX * escala,
-                y: offsetY + py * escala,
-                w: (anchoBodega - 2 * sepParedX) * escala,
-                h: altoPasilloY * escala,
-                orientacion: "horizontal",
-            });
-            py += altoPasilloY;
-        }
+    if (porLargo > 1) {
+        const py = SEP_PARED + (racksArr * largoRack) + ((racksArr - 1) * SEP_RACK);
+        pasillos.push({
+            id: `py-central`,
+            x: offsetX + SEP_PARED * escala,
+            y: offsetY + py * escala,
+            w: (anchoBodega - (2 * SEP_PARED)) * escala,
+            h: anchoPasilloY * escala,
+            orientacion: "horizontal",
+        });
     }
+
     return {
         valido: true,
-        ancho:    anchoDibujo,
-        largo:    largoDibujo,
+        ancho: anchoDibujo,
+        largo: largoDibujo,
         offsetX,
         offsetY,
         racks,
         pasillos,
-
         anchoSVG,
         altoSVG,
         escala,
-        sepParedX,
-        sepParedY,
-        anchoBloqueReal,
-        largoBloqueReal,
-        racksPorBloqueX,
-        racksPorBloqueY,
     };
 }

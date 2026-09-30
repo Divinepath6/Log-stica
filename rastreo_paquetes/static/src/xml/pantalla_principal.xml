@@ -42,7 +42,6 @@
                             <div class="card-body">
                                 <strong>Cotización: <t t-esc="p.numero_guia"/></strong>
                                 <strong>Cliente: <t t-esc="p.cliente_nombre || ''"/></strong>
-                                <div>ID: <t t-esc="p.id || 0"/></div>
                                 <div>Anticipo recibido de cliente: <t t-esc="p.anticipo_cliente || 0"/></div>
                                 <div>Anticipo dado a proveedor: <t t-esc="p.anticipo_proveedor || 0"/></div>
                                 <div>

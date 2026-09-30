@@ -199,7 +199,8 @@
                                 totalRacks="state.racksOcupados"
                                 pasillosX="state.pasillosX"
                                 pasillosY="state.pasillosY"
-                                anchoPasillo="state.anchoPasillo"
+                                anchoPasilloX="state.anchoPasilloX"
+                                anchoPasilloY="state.anchoPasilloY"
                             />
                         </div>
                     </div>
