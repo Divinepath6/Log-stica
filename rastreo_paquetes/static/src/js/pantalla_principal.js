@@ -3,10 +3,10 @@ import { registry } from "@web/core/registry";
 import { Component, onWillStart, useState   } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks"; 
 import { componente_creacion_pedido } from "./componente_creacion_pedido";
-
+import {componente_edicion_racks} from "./componente_edicion_racks";
 export class PantallaPrincipal extends Component { 
     
-    static components = { componente_creacion_pedido };
+    static components = { componente_creacion_pedido , componente_edicion_racks };
     setup() {
         this.notification = useService("notification");
         this.action = useService("action");
@@ -64,6 +64,17 @@ export class PantallaPrincipal extends Component {
             target: "current",
             });
         }
+        
+    }
+    async onclickEditarRacks(){
+        this.dialogService.add(componente_edicion_racks, {
+                confirm: async () => {
+
+                },
+                cancel: () => {
+                    
+                }
+        });
         
     }
     onBusqueda(ev){

@@ -11,11 +11,11 @@ export class componente_edicion_racks extends Component{
         title: { type: String, optional: true },
         confirm: { type: Function, optional: true },
         cancel: { type: Function, optional: true },
-    };
-    static components = { Dialog };
-    
+    }; 
     setup() {
         this.orm = useService("orm");
+        this.notification = useService("notification");
+
         this.state = useState({
             //state para el rack seleccionado:
             rackSeleccionadoId: 0,
@@ -26,15 +26,16 @@ export class componente_edicion_racks extends Component{
             ancho: 0,
             largo: 0,
 
+            //Estados
+            editando: false,
+            cargando: false,
+
             //lista
             racks: [],
-            cargando: false,
+            
         })
         onWillStart(async () => {
-            if (this.props.action && this.props.action.params) {
-                await this.listarRacks();
-            }
-            
+            await this.listarRacks();
         });
     }
 
@@ -42,14 +43,14 @@ export class componente_edicion_racks extends Component{
         const datos = {
             clave: this.state.clave,
             nombre: this.state.nombre,
-            precio_unitario: (this.state.precioUnitario).ToFixed(2),
+            precio_unitario: Number(this.state.precioUnitario).toFixed(2),
             altura: this.state.altura,
             ancho: this.state.ancho,
             largo: this.state.largo,
         };
         const resultado = await this.orm.call(
             "rastreo.rack_detalle", 
-            "crear_rack",
+            "guardar_rack",
             [datos]
         );
         if(resultado.success){
@@ -68,22 +69,24 @@ export class componente_edicion_racks extends Component{
             );
         }
     }
-    async cargarRack() {
+
+    
+    async cargarRack(id) {
         const resultado = await this.orm.call(
             "rastreo.rack_detalle", 
             "obtener_rack",
-            [rackSeleccionadoId]
+            [id]
         );
         if(resultado.success){
             const r = resultado.data;
-
+            this.state.rackSeleccionadoId = id
             this.state.clave = r.clave;
             this.state.nombre = r.nombre;
-            this.state.precioUnitario = r.precio_unitario.ToFixed(2);
+            this.state.precioUnitario = r.precio_unitario.toFixed(2);
             this.state.altura = r.altura;
             this.state.ancho = r.ancho;
             this.state.largo = r.largo;
-            
+            this.state.editando = true;
         }else{
             this.notification.add(
                 "Hubo un error, intentelo mas tarde",
@@ -99,7 +102,7 @@ export class componente_edicion_racks extends Component{
                 "listar_racks",
             );
             if(resultado.success){
-                this.state.racks = resultado.lista
+                this.state.racks = resultado.data
             }else{
                 this.notification.add(
                     "Hubo un error",
@@ -112,14 +115,53 @@ export class componente_edicion_racks extends Component{
         }
         
     }
-    async onSeleccionarRack(){
-        await cargarRack();
+    
+    limpiarFormulario() {
+        this.state.rackSeleccionadoId = 0;
+        this.state.clave = "";
+        this.state.nombre = "";
+        this.state.precioUnitario = 0.0;
+        this.state.altura = 0;
+        this.state.ancho = 0;
+        this.state.largo = 0;
+    }
+
+    onCrearNuevo() {
+        this.limpiarFormulario();
+        this.state.editando = true;
+    }
+
+    onCancelarEdicion() {
+        this.limpiarFormulario();
+        this.terminarEdicion();
+    }
+
+    async onSeleccionarRack(rack){
+        console.log(rack)
+        await this.cargarRack(rack.id);
     }
     async onBuscar(){
         await this.listarRacks()
     }
+    async terminarEdicion(){
+        this.state.editando = false;
+        await this.listarRacks();
+    }
     async onGuardar(){
+        if (!this.state.ancho || !this.state.largo || !this.state.altura ) {
+            this.notification.add("Hacen falta Datos", { type: "warning" });
+            return;
+        }
+        if (!this.state.nombre) {
+            this.notification.add("Hacen falta un nombre", { type: "warning" });
+            return;
+        }
+        if (!this.state.precioUnitario) {
+            this.notification.add("Hacen falta un Precio", { type: "warning" });
+            return;
+        }
         await this.guadarRack()
+        this.terminarEdicion();
     }
     _onConfirm() {
         this.props.close();

@@ -177,12 +177,21 @@ export class PantallaCroquis extends Component {
     }
 
    async cargarRacks(){
-        const racks = 
-        [
-            ["Rack 1220 x 1220 x 1620", [1220 ,1220,1620], 122.65], 
-            ["Rack 1524 x 1424 x 1524", [1524 ,1424,1524], 153.60] 
-        ];
-        this.state.rackTipos = racks
+         try {
+            const resultado = await this.orm.call(
+                "rastreo.rack_detalle",
+                "listar_racks",
+            );
+            if(resultado.success){
+                this.state.rackTipos = resultado.data.map((r,i) =>{
+                    return [r.nombre, r.medidas, r.precio_unitario]
+                })
+            }else{
+               this.state.rackTipos = []
+            }
+        } finally {
+            this.state.cargando = false;
+        }
     }
 
     async onClickCambiarEstado(){
@@ -432,6 +441,8 @@ export class PantallaCroquis extends Component {
 
             const racksMathHor = ((anchoBodega - separacionPared * 2) / (anchoRackM + separacionRack)) + 0.16;
             const racksMathVer = ((largoBodega - separacionPared * 2) / (largoRackM + separacionRack)) + 0.16;
+
+            
             const porAncho       = Math.max(0, Math.floor(racksMathHor));
             const porLargo       = Math.max(0, Math.floor(racksMathVer));
             const racksOcupados  = porAncho * porLargo * altoBodega;
@@ -439,6 +450,14 @@ export class PantallaCroquis extends Component {
             const costoRack   = Number(b.rackSeleccionadoCosto) || 0;
             const costoBodega = costoRack * racksOcupados;
             costoEstimadoTotal += costoBodega;
+
+            let espacioSobranteHor = (anchoBodega - (separacionPared*2) - ((anchoRackM + separacionRack) * porAncho)) + separacionRack ;
+            if(espacioSobranteHor < 0){ espacioSobranteHor = 0.00}
+            const sobranteH = (espacioSobranteHor + .60).toFixed(2);
+
+            let espacioSobranteVer = (largoBodega - (separacionPared*2) - ((largoRackM  + separacionRack) * porLargo)) + separacionRack ;
+            if(espacioSobranteVer < 0){ espacioSobranteVer = 0.00}
+            const sobranteV = (espacioSobranteVer + .60).toFixed(2);
 
             const layout = calcularLayoutCroquis({
                 anchoBodega:  anchoBodega,
@@ -461,6 +480,8 @@ export class PantallaCroquis extends Component {
                 largoRack:     largoRackmm,
                 altoRack:      altoRackmm,
 
+                sobranteH: sobranteH || 0,
+                sobranteV: sobranteV || 0,
                 porAncho:      porAncho,
                 porLargo:      porLargo,
                 racksOcupados: racksOcupados,

@@ -10,7 +10,7 @@
     'license': 'LGPL-3',
     'category': 'Logística',
     'version': '0.1',
-    'depends': ['base', 'web', 'crm' , 'inventory'],
+    'depends': ['base', 'web', 'crm' , 'stock'],
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',

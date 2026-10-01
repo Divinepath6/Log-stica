@@ -79,6 +79,11 @@
                     display: block;
                     margin: 0; /* Quitamos el margen auto para pegar a la izquierda */
                 }
+                .texto{
+                    font-size: 12px;
+                    margin-bottom: 1px; 
+                    color: #000000 ;"
+                }
             </style>
 
             <div class="page">
@@ -92,14 +97,12 @@
                         <div style="text-align: left;">
                             <h1 style="margin: 0; font-size: 13px; color: #000000 ;">
                                 Croquis para la propuesta
-                            </h1>
-                            <p style="margin: 0; font-size: 8px; color: #666;">
                                 Fecha: <t t-esc="datos.get('fecha', '')"/>
-                            </p>
+                            </h1>
                         </div>
                     </div>
 
-                    <div style="font-size: 9px; margin-bottom: 2px; color: #000000 ;">
+                    <div class="texto">
                         <b>Cliente:</b> <t t-esc="datos.get('clienteNombre', '')"/> 
                         <b>Ubicaci&#243;n:</b> <t t-esc="datos.get('ubicacion', '')"/>
                     </div>
@@ -117,11 +120,11 @@
                     <div class="page" t-attf-style="page-break-after: #{'auto' if b_last else 'always'};">
                         <div class="content-principal">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; border-bottom: 1px solid #e3e7f0; padding-bottom: 2px;">
-                                <div style="font-size: 8px; color: #000000;">
+                                <div class="texto"  >
                                     <t t-esc="datos.get('clienteNombre', '')"/>
                                     <t t-esc="datos.get('ubicacion', '')"/>
                                 </div>
-                                <div style="font-size: 8px; color: #000000;">
+                                <div class="texto"  >
                                     <t t-esc="datos.get('fecha', '')"/>
                                 </div>
                             </div>
@@ -138,15 +141,19 @@
 
     <template id="croquis_svg_bodega">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1px;">
-            <h2 style="margin: 0; font-size: 9px; color: #000000;">
+            <h2 class="texto">
                 Bodega #<t t-esc="bodega['numero_bodega']"/>
             </h2>
-            <div style="font-size: 9px; color: #000000;">
+            <div class="texto"  >
                 Ancho: <b><t t-esc="bodega['anchoBodega']"/> m</b> 
                 Largo: <b><t t-esc="bodega['largoBodega']"/> m</b>
             </div>
-            <div style="font-size: 9px; color: #000000;">
+            <div class="texto"  >
                 Rack: <b><t t-esc="bodega['rackNombre']"/> </b> 
+            </div>
+            <div class="texto"  >
+                Sobrante horizontalmente (M): <b><t t-esc="bodega['sobranteH']"/> </b> 
+                Sobrante Verticalmente (M): <b><t t-esc="bodega['sobranteV']"/> </b> 
             </div>
         </div>
 
