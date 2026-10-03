@@ -7,12 +7,15 @@ export function calcularLayoutCroquis(props) {
     const largoRack    = Number(props.largoRack)   || 0;
     const porAncho     = Number(props.porAncho)    || 0;
     const porLargo     = Number(props.porLargo)    || 0;
-
+    //Largo
+    const separacionParedArr = Number(props.sepParedArr)/ 100 || .30;
+    const separacionParedAba = Number(props.sepParedAba)/ 100 || .30;
+    //Ancho
+    const separacionParedIzq = Number(props.sepParedIzq)/ 100 || .30;
+    const separacionParedDer = Number(props.sepParedDer)/ 100|| .30;
     if (!anchoBodega || !largoBodega || !porAncho || !porLargo) {
         return { valido: false, ancho: 0, largo: 0, racks: [], pasillos: [] };
     }
-
-    const SEP_PARED = 0.30;
     const SEP_RACK  = 0.15;
 
     const espacioOcupadoRacksX = (porAncho * anchoRack) + ((porAncho - 1) * SEP_RACK);
@@ -22,13 +25,13 @@ export function calcularLayoutCroquis(props) {
     let anchoPasilloY = 0;
     
     if (porAncho > 1) {
-        anchoPasilloX = (anchoBodega - (2 * SEP_PARED)) - (espacioOcupadoRacksX - SEP_RACK);
-        if (anchoPasilloX < 0) anchoPasilloX = SEP_RACK; 
+        anchoPasilloX = (anchoBodega - (separacionParedIzq + separacionParedDer)) - (espacioOcupadoRacksX - SEP_RACK);
+        if (anchoPasilloX < 0) anchoPasilloX = 0; 
     }
 
     if (porLargo > 1) {
-        anchoPasilloY = (largoBodega - (2 * SEP_PARED)) - (espacioOcupadoRacksY - SEP_RACK);
-        if (anchoPasilloY < 0) anchoPasilloY = SEP_RACK; 
+        anchoPasilloY = (largoBodega - (separacionParedArr + separacionParedAba)) - (espacioOcupadoRacksY - SEP_RACK);
+        if (anchoPasilloY < 0) anchoPasilloY = 0; 
     }
 
     const racksIzq = Math.ceil(porAncho / 2);
@@ -56,8 +59,8 @@ export function calcularLayoutCroquis(props) {
             let sumPasilloX = (i >= racksIzq && porAncho > 1) ? (anchoPasilloX - SEP_RACK) : 0;
             let sumPasilloY = (j >= racksArr && porLargo > 1) ? (anchoPasilloY - SEP_RACK) : 0;
 
-            const xm = SEP_PARED + (i * (anchoRack + SEP_RACK)) + sumPasilloX;
-            const ym = SEP_PARED + (j * (largoRack + SEP_RACK)) + sumPasilloY;
+            const xm = separacionParedIzq + (i * (anchoRack + SEP_RACK)) + sumPasilloX;
+            const ym = separacionParedArr + (j * (largoRack + SEP_RACK)) + sumPasilloY;
 
             racks.push({
                 id: `r-${i}-${j}`,
@@ -72,24 +75,24 @@ export function calcularLayoutCroquis(props) {
     const pasillos = [];
     
     if (porAncho > 1) {
-        const px = SEP_PARED + (racksIzq * anchoRack) + ((racksIzq - 1) * SEP_RACK);
+        const px = separacionParedIzq + (racksIzq * anchoRack) + ((racksIzq - 1) * SEP_RACK);
         pasillos.push({
             id: `px-central`,
             x: offsetX + px * escala,
-            y: offsetY + SEP_PARED * escala,
+            y: offsetY + separacionParedIzq * escala,
             w: anchoPasilloX * escala,
-            h: (largoBodega - (2 * SEP_PARED)) * escala,
+            h: (largoBodega - (separacionParedIzq + separacionParedDer)) * escala,
             orientacion: "vertical",
         });
     }
 
     if (porLargo > 1) {
-        const py = SEP_PARED + (racksArr * largoRack) + ((racksArr - 1) * SEP_RACK);
+        const py = separacionParedArr + (racksArr * largoRack) + ((racksArr - 1) * SEP_RACK);
         pasillos.push({
             id: `py-central`,
-            x: offsetX + SEP_PARED * escala,
+            x: offsetX + separacionParedArr * escala,
             y: offsetY + py * escala,
-            w: (anchoBodega - (2 * SEP_PARED)) * escala,
+            w: (anchoBodega - ( separacionParedArr + separacionParedAba)) * escala,
             h: anchoPasilloY * escala,
             orientacion: "horizontal",
         });

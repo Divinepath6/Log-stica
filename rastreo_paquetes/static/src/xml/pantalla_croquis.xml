@@ -104,6 +104,36 @@
                         </div>
 
                         <div class="odoo-field">
+                            <label class="odoo-label">Separación Arriba (CM):</label>
+                            <input type="number" class="odoo-input"
+                                   t-model="state.sepParedArr"
+                                   t-on-change="onCalcular"/>
+                        </div>
+
+                        <div class="odoo-field">
+                            <label class="odoo-label">Separación Abajo (CM):</label>
+                            <input type="number" class="odoo-input"
+                                   t-model="state.sepParedAba"
+                                   t-on-change="onCalcular"/>
+                        </div>
+
+                        <div class="odoo-field">
+                            <label class="odoo-label">Separación Izquierda (CM):</label>
+                            <input type="number" class="odoo-input"
+                                   t-model="state.sepParedIzq"
+                                   t-on-change="onCalcular"/>
+                        </div>
+
+                         <div class="odoo-field">
+                            <label class="odoo-label">Separación Derecha (CM):</label>
+                            <input type="number" class="odoo-input"
+                                   t-model="state.sepParedDer"
+                                   t-on-change="onCalcular"/>
+                        </div>
+                    
+
+
+                        <div class="odoo-field">
                             <label class="odoo-label">Comentarios:</label>
                             <textarea class="odoo-textarea"
                                       rows="3"
@@ -112,6 +142,7 @@
                         </div>
                     </div>
 
+                    
                     <div class="cc-card">
                         <h3 class="cc-card-title">
                             <span class="cc-badge-dot"></span>
@@ -143,12 +174,12 @@
                         </div>
 
                         <div class="odoo-result-row">
-                            <span class="odoo-result-label">Espacio Sobrante horizontalmente (M):</span>
+                            <span class="odoo-result-label">Ancho del pasill Vertical (M):</span>
                             <span class="odoo-result-value" t-esc="state.espacioSobranteHor or '0.00'"/>
                         </div>
 
                         <div class="odoo-result-row">
-                            <span class="odoo-result-label">Espacio Sobrante Verticalmente (M):</span>
+                            <span class="odoo-result-label">Ancho del pasillo Horizontal(M):</span>
                             <span class="odoo-result-value" t-esc="state.espacioSobranteVer or '0.00'"/>
                         </div>
 
@@ -187,11 +218,10 @@
                         </div>
 
                         <div class="cc-croquis-canvas">
-                            <CreacionCroquis
+                            <CreacionCroquis 
                                 anchoBodega="state.anchoBodega"
                                 largoBodega="state.largoBodega"
                                 alturaBodega="state.alturaBodega"
-                                separacion="state.separacion"
                                 anchoRack="state.anchoRack"
                                 largoRack="state.largoRack"
                                 porAncho="state.porAncho"
@@ -199,8 +229,12 @@
                                 totalRacks="state.racksOcupados"
                                 pasillosX="state.pasillosX"
                                 pasillosY="state.pasillosY"
-                                anchoPasilloX="state.anchoPasilloX"
+                                anchoPasilloX="state.anchoPasilloX" 
                                 anchoPasilloY="state.anchoPasilloY"
+                                sepParedArr="state.sepParedArr"
+                                sepParedAba="state.sepParedAba"
+                                sepParedIzq="state.sepParedIzq"
+                                sepParedDer="state.sepParedDer"
                             />
                         </div>
                     </div>

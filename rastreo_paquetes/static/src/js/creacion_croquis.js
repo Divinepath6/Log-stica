@@ -22,7 +22,6 @@ CreacionCroquis.props = {
     anchoBodega:  { type: [Number, String], optional: true },
     largoBodega:  { type: [Number, String], optional: true },
     alturaBodega: { type: [Number, String], optional: true },
-    separacion:   { type: [Number, String], optional: true },
     anchoRack:    { type: [Number, String], optional: true },
     largoRack:    { type: [Number, String], optional: true },
     porAncho:     { type: [Number, String], optional: true },
@@ -31,4 +30,9 @@ CreacionCroquis.props = {
     pasillosX:    { type: [Number, String], optional: true },
     pasillosY:    { type: [Number, String], optional: true },
     anchoPasillo: { type: [Number, String], optional: true },
+    sepParedArr: { type: [Number, String], optional: true },
+    sepParedAba: { type: [Number, String], optional: true },
+    sepParedIzq: { type: [Number, String], optional: true },
+    sepParedDer: { type: [Number, String], optional: true },
+
 };

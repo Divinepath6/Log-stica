@@ -29,7 +29,7 @@ export class PantallaCroquis extends Component {
             ubicacion: "",
             // Valores "de la bodega"
                   
-               // metros
+            
             rackSeleccionadomedidas: [],
             rackSeleccionadoIndex: 0,
             rackSeleccionadoCosto: 0,
@@ -38,6 +38,12 @@ export class PantallaCroquis extends Component {
             largoBodega: 0, // metros
             comentarios: "",
             racksOcupados: 0,
+
+            //orillas
+            sepParedArr: 30,
+            sepParedAba: 30,
+            sepParedIzq: 30,
+            sepParedDer: 30,
 
             // Valores "calculables"
             anchoPasilloX: 0,
@@ -80,6 +86,12 @@ export class PantallaCroquis extends Component {
         this.state.anchoBodega = bodega.anchoBodega;
         this.state.largoBodega = bodega.largoBodega;
         this.state.comentarios = bodega.comentarios
+
+        this.state.sepParedArr = bodega.sepParedArr;
+        this.state.sepParedAba = bodega.sepParedAba;
+        this.state.sepParedIzq = bodega.sepParedIzq;
+        this.state.sepParedDer = bodega.sepParedDer;
+    
         this.calcularRacks();
     }
     crearBodegaLista(){
@@ -90,7 +102,11 @@ export class PantallaCroquis extends Component {
             alturaBodega: 1, 
             anchoBodega:0 ,
             largoBodega: 0, 
-            comentarios: ""
+            comentarios: "",
+            sepParedArr: 30,
+            sepParedAba: 30,
+            sepParedIzq: 30,
+            sepParedDer: 30,
         });
         this.state.bodegaIndex = this.state.bodegas.length- 1; 
     }
@@ -105,6 +121,10 @@ export class PantallaCroquis extends Component {
             anchoBodega: this.state.anchoBodega, 
             largoBodega: this.state.largoBodega, 
             comentarios: this.state.comentarios,
+            sepParedArr: this.state.sepParedArr,
+            sepParedAba: this.state.sepParedAba,
+            sepParedIzq: this.state.sepParedIzq,
+            sepParedDer: this.state.sepParedDer,
         }
         this.state.bodegas[this.state.bodegaIndex] = bodega;
     }
@@ -127,7 +147,11 @@ export class PantallaCroquis extends Component {
                         alturaBodega:b.niveles,
                         anchoBodega:b.ancho,
                         largoBodega: b.largo,
-                        comentarios: b.descripcion
+                        comentarios: b.descripcion,
+                        sepParedArr: 30,
+                        sepParedAba: 30,
+                        sepParedIzq: 30,
+                        sepParedDer: 30,
                     }
                 });
                 if (this.state.bodegas.length === 0) {
@@ -137,7 +161,11 @@ export class PantallaCroquis extends Component {
                             alturaBodega: 1, 
                             anchoBodega:0 ,
                             largoBodega: 0, 
-                            comentarios: ""
+                            comentarios: "",
+                            sepParedArr: 30,
+                            sepParedAba: 30,
+                            sepParedIzq: 30,
+                            sepParedDer: 30,
                         });
                         this.state.bodegaIndex = 0; 
                     }
@@ -150,7 +178,11 @@ export class PantallaCroquis extends Component {
                             alturaBodega: 1, 
                             anchoBodega:0 ,
                             largoBodega: 0, 
-                            comentarios: ""
+                            comentarios: "",
+                            sepParedArr: 30,
+                            sepParedAba: 30,
+                            sepParedIzq: 30,
+                            sepParedDer: 30,
                         });
                         this.state.bodegaIndex = 0; 
                     }
@@ -246,8 +278,11 @@ export class PantallaCroquis extends Component {
             return;
         }
 
-        // Calculos en Milimetros ---- Milimetros ---- Milimetros
-        const separacionPared = .30;  
+        const separacionParedArr = this.state.sepParedArr / 100;
+        const separacionParedAba = this.state.sepParedAba / 100;
+        const separacionParedIzq = this.state.sepParedIzq / 100;
+        const separacionParedDer = this.state.sepParedDer / 100;
+    
         const separacionRack  = .15;  
         const anchoBodega  = Number(this.state.anchoBodega) || 0;
         const largoBodega  = Number(this.state.largoBodega) || 0;
@@ -268,8 +303,9 @@ export class PantallaCroquis extends Component {
         const anchoRackM = anchoRackmm / 1000; 
         const largoRackM  = largoRackmm / 1000; 
 
-        const racksMathHor = ((anchoBodega - (separacionPared*2)) / (anchoRackM + separacionRack))+ .16 ;
-        const racksMathVer = ((largoBodega - (separacionPared*2)) / (largoRackM + separacionRack)) + .16  ;
+        const racksMathHor = ((anchoBodega - (separacionParedIzq + separacionParedDer)) / (anchoRackM + separacionRack))+ .16 ;
+
+        const racksMathVer = ((largoBodega - (separacionParedArr + separacionParedAba)) / (largoRackM + separacionRack)) + .16  ;
         const porAncho = Math.max(0, Math.floor( racksMathHor ));
         const porLargo = Math.max(0, Math.floor( racksMathVer ));
         
@@ -283,16 +319,15 @@ export class PantallaCroquis extends Component {
         }
 
 
-        let espacioSobranteHor = (anchoBodega - (separacionPared*2) - ((anchoRackM + separacionRack) * porAncho)) + separacionRack ;
+        let espacioSobranteHor = (anchoBodega - (separacionParedIzq + separacionParedDer) - ((anchoRackM + separacionRack) * (porAncho))) + separacionRack ;
         if(espacioSobranteHor < 0){ espacioSobranteHor = 0.00}
         this.state.anchoPasilloY = espacioSobranteHor;
-        this.state.espacioSobranteHor = (espacioSobranteHor + .60).toFixed(2);
+        this.state.espacioSobranteHor = (espacioSobranteHor).toFixed(2);
 
-
-        let espacioSobranteVer = (largoBodega - (separacionPared*2) - ((largoRackM  + separacionRack) * porLargo)) + separacionRack ;
+        let espacioSobranteVer = (largoBodega - (separacionParedArr + separacionParedAba) - ((largoRackM  + separacionRack) * porLargo)) + separacionRack ;
         if(espacioSobranteVer < 0){ espacioSobranteVer = 0.00}
         this.state.anchoPasilloX = espacioSobranteVer;
-        this.state.espacioSobranteVer = (espacioSobranteVer + .60).toFixed(2);
+        this.state.espacioSobranteVer = (espacioSobranteVer).toFixed(2);
 
 
         this.state.racksOcupados  = porAncho * porLargo * altoBodega;
@@ -378,6 +413,8 @@ export class PantallaCroquis extends Component {
             if (!Number(b.anchoBodega) || !Number(b.largoBodega)) {
                 this.notification.add(`Bodega ${i + 1}: faltan datos`, { type: "warning" });
                 return;
+            }else{
+                this.guardarBodegaActual()
             }
         }
 
@@ -419,6 +456,8 @@ export class PantallaCroquis extends Component {
             this.notification.add("Error: no se logró generar el PDF", { type: "warning" });
         }
     }
+
+
     convertirBodegasLista() {
         let costoEstimadoTotal = 0;
         const bodegas = this.state.bodegas.map((b, i) => {
@@ -427,20 +466,23 @@ export class PantallaCroquis extends Component {
                 return null; 
             }
 
-            const separacionPared = 0.30;
             const separacionRack  = 0.15;
-            const anchoBodega     = Number(b.anchoBodega) || 0;
-            const largoBodega     = Number(b.largoBodega) || 0;
-            const altoBodega      = Number(b.alturaBodega) || 1;
-
+            const anchoBodega     =     Number(b.anchoBodega)  || 0;
+            const largoBodega     =     Number(b.largoBodega)  || 0;
+            const altoBodega      =     Number(b.alturaBodega) || 1;
+            const separacionParedArr =  (Number(b.sepParedArr) || 30)/ 100;
+            const separacionParedAba =  (Number(b.sepParedAba) || 30)/ 100;
+            const separacionParedIzq =  (Number(b.sepParedIzq) || 30)/ 100;
+            const separacionParedDer =  (Number(b.sepParedDer) || 30)/ 100;
+            console.log(separacionParedDer, separacionParedIzq, separacionParedAba, separacionParedArr )
             const [nombreRack, medidas] = this.state.rackTipos[idx];
             const [anchoRackmm, largoRackmm, altoRackmm] = medidas;
 
             const anchoRackM = anchoRackmm / 1000;
             const largoRackM = largoRackmm / 1000;
 
-            const racksMathHor = ((anchoBodega - separacionPared * 2) / (anchoRackM + separacionRack)) + 0.16;
-            const racksMathVer = ((largoBodega - separacionPared * 2) / (largoRackM + separacionRack)) + 0.16;
+            const racksMathHor = ((anchoBodega - (separacionParedIzq + separacionParedDer)) / (anchoRackM + separacionRack)) + 0.16;
+            const racksMathVer = ((largoBodega - (separacionParedArr + separacionParedAba)) / (largoRackM + separacionRack)) + 0.16;
 
             
             const porAncho       = Math.max(0, Math.floor(racksMathHor));
@@ -451,13 +493,13 @@ export class PantallaCroquis extends Component {
             const costoBodega = costoRack * racksOcupados;
             costoEstimadoTotal += costoBodega;
 
-            let espacioSobranteHor = (anchoBodega - (separacionPared*2) - ((anchoRackM + separacionRack) * porAncho)) + separacionRack ;
-            if(espacioSobranteHor < 0){ espacioSobranteHor = 0.00}
-            const sobranteH = (espacioSobranteHor + .60).toFixed(2);
+            let espacioSobranteAncho = (anchoBodega - (separacionParedIzq + separacionParedDer) - (anchoRackM * porAncho) - (separacionRack * (porAncho)))+separacionRack;
+            if(espacioSobranteAncho < 0){ espacioSobranteAncho = 0.00}
+            const sobranteH = (espacioSobranteAncho ).toFixed(2);
 
-            let espacioSobranteVer = (largoBodega - (separacionPared*2) - ((largoRackM  + separacionRack) * porLargo)) + separacionRack ;
-            if(espacioSobranteVer < 0){ espacioSobranteVer = 0.00}
-            const sobranteV = (espacioSobranteVer + .60).toFixed(2);
+            let espacioSobranteLargo = (largoBodega - (separacionParedArr + separacionParedAba) - ((largoRackM  + separacionRack) * (porLargo)))+separacionRack ;
+            if(espacioSobranteLargo < 0){ espacioSobranteLargo = 0.00}
+            const sobranteV = (espacioSobranteLargo ).toFixed(2);
 
             const layout = calcularLayoutCroquis({
                 anchoBodega:  anchoBodega,
@@ -466,10 +508,13 @@ export class PantallaCroquis extends Component {
                 largoRack:    largoRackM,
                 porAncho:     porAncho,
                 porLargo:     porLargo,
-                pasillosX:    1,
-                pasillosY:    1,
-                anchoPasilloX: this.state.anchoPasilloX,
-                anchoPasilloY: this.state.anchoPasilloY
+                pasillosX:      0,
+                pasillosY:      0,
+
+                sepParedArr : Number(b.sepParedArr),
+                sepParedAba : Number(b.sepParedAba),
+                sepParedIzq : Number(b.sepParedIzq),
+                sepParedDer : Number(b.sepParedDer),
             });
 
             return {
@@ -513,7 +558,11 @@ export class PantallaCroquis extends Component {
             pasillosX:    this.state.pasillosX,
             pasillosY:    this.state.pasillosY,
             anchoPasilloX: this.state.anchoPasilloX,
-            anchoPasilloY: this.state.anchoPasilloY
+            anchoPasilloY: this.state.anchoPasilloY,
+            sepParedArr : this.state.sepParedArr,
+            sepParedAba : this.state.sepParedAba,
+            sepParedIzq : this.state.sepParedIzq,
+            sepParedDer : this.state.sepParedDer,
         });
     }
 
