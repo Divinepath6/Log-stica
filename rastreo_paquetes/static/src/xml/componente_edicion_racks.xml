@@ -2,15 +2,17 @@
 <templates xml:space="preserve">
     <t t-name="rastreo_paquetes.componente_edicion_racks_embed">
         <Dialog title="'Seleccionar / Editar Rack'" size="'md'">
-
-            <div class="d-flex gap-2 mb-3">
-                <button class="btn btn-primary" t-on-click="onBuscar">
-                    <i class="oi oi-search me-1"/> Actualizar Lista
-                </button>
-                <button class="btn btn-secondary" t-on-click="onCrearNuevo">
-                    <i class="oi oi-plus me-1"/> Crear Nuevo
-                </button>
-            </div>
+             <t t-if="state.editando">
+                <div class="d-flex gap-2 mb-3">
+                    <button class="btn btn-primary" t-on-click="onBuscar">
+                        <i class="oi oi-search me-1"/> Actualizar Lista
+                    </button>
+                    <button class="btn btn-secondary" t-on-click="onCrearNuevo">
+                        <i class="oi oi-plus me-1"/> Crear Nuevo
+                    </button>
+                </div>
+             </t>
+            
 
             <t t-if="state.editando">
                 <div class="o_form_view p-2 border rounded bg-light">
@@ -20,6 +22,26 @@
                     </h5>
 
                     <div class="row g-3">
+                        
+         
+                        <div class="col-md-6">
+                            <label for="clave" class="form-label fw-bold">Producto</label>
+                            <span type="text" 
+                                   id="clave" 
+                                   class="form-control" 
+                                   placeholder="Ej. RACK-001" 
+                                   t-esc="state.productoId"/>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="clave" class="form-label fw-bold">Precio Producto</label>
+                            <span type="text" 
+                                   id="clave" 
+                                   class="form-control" 
+                                   placeholder="Ej. RACK-001" 
+                                   t-esc="state.productoPrecio"/>
+                        </div>
+
                         <div class="col-md-6">
                             <label for="clave" class="form-label fw-bold">Clave</label>
                             <input type="text" 

@@ -42,6 +42,8 @@
             'rastreo_paquetes/static/src/js/componente_edicion_racks.js',
             'rastreo_paquetes/static/src/xml/componente_edicion_racks.xml',
 
+            'rastreo_paquetes/static/src/js/componente_busqueda_producto.js',
+            'rastreo_paquetes/static/src/xml/componente_busqueda_producto.xml',
         ],
     },
     'installable': True,

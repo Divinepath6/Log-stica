@@ -2,9 +2,10 @@
 import { Component, useState, onWillStart } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { useService } from "@web/core/utils/hooks"; 
-
+import {componente_busqueda_producto} from "./componente_busqueda_producto"
 export class componente_edicion_racks extends Component{
     static template = "rastreo_paquetes.componente_edicion_racks_embed";
+    static components = { componente_busqueda_producto };
     static components = { Dialog };
     static props = {
         close: Function,
@@ -32,12 +33,28 @@ export class componente_edicion_racks extends Component{
 
             //lista
             racks: [],
+            productos:[],
+            terminoBusqueda: "",
             
         })
         onWillStart(async () => {
             await this.listarRacks();
         });
     }
+
+    async onClickBuscarProducto(ev) {
+        this.dialogService.add(componente_busqueda_producto,  {
+                title: "Confirmación",
+                confirm: async () => {
+                    
+                },
+                cancel: () => {
+                console.log("Cancelado");
+            }
+        });
+    }
+   
+
 
     async guadarRack() {
         const datos = {

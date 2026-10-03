@@ -97,4 +97,22 @@ class rastreo_rack_detalle(models.Model):
                 'precio_unitario':  r.precio_unitario,
                 'medidas': [r.ancho, r.largo, r.altura]
                 })
-        return {'data': lista , 'success': True,}                
+        return {'data': lista , 'success': True,}   
+    
+    @api.model
+    def listar_productos(self, termino_busqueda):
+        if not termino_busqueda:
+            return {'success': False, 'error': 'Sin termino de busqueda'}
+        domain = [          
+                    ('product.name', 'ilike', termino_busqueda),
+                ]
+        racks = self.env['stock.product'](domain, limit=100)
+
+        lista = []
+        for r in racks:
+            lista.append({
+                'id':               r.id,
+                'nombre':            r.name
+                })
+        return {'data': lista , 'success': True,}      
+             
