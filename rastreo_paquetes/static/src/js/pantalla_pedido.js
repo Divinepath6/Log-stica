@@ -1,114 +1,85 @@
 /** @odoo-module **/
-
-import { Component, useRef, useState, onWillStart } from "@odoo/owl";
-import { registry } from "@web/core/registry";
-import { standardFieldProps } from "@web/views/fields/standard_field_props";
+import { Component, useState, onWillStart } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
 
-
-export class PdfUploader extends Component {
-    static template = "rastreo_paquetes.PdfUploader";
-    static props = {...standardFieldProps,};
+export class PantallaPedido extends Component {
     setup() {
+        this.action = useService("action");
         this.orm = useService("orm");
         this.notification = useService("notification");
-        this.pdfInput = useRef("selectorPDF");
+        this.dialogService = useService("dialog")
         this.state = useState({
-            pedido: null,
-            cargando: true,
-        })
-        onWillStart( async () =>{
-            this.cargarPedido();
+            // Valores "Generales"
+            pedidoId: 0,
+            nombre: "",
+            Guia: "",
+            clienteId: 0,
+            clienteNombre: "",
+            estado: "",
+            
+
+            // Listas de detalles
+            detalleRacks:[],
+            detalleCliente: [],
+            detalleProveedor: [],
+
+            //bool de PDF
+            forwarder: false,
+            pdf_BL: false,
+            pdf_PL: false,
+            pdf_invoice: false,
+            pdf_contrato_proveedor:false,
+            pdf_factura_proveedor: false,
+
+            // Monedas
+            total_proveedor: 0.0,
+            total_cliente: 0.0,
+            numero_contrato: "",
+
+            
+            cargando: false,
+
         });
+        onWillStart(async () => {
+            if (this.props.action && this.props.action.params) {
+                const pedidoId = this.props.action.params.pedido_id || null;
+                await this.state.cargarPedido()
+                this.state.pedidoId = pedidoId;
+            }
+        });
+        this.searchTimeout = null;
     }
-
-    onAbrirSelectorPDF() {
-        this.pdfInput.el.click();
-    }
-
-    onClickVerPDF() {
-        const pedidoId = this.props.record.resId;
-        const campo = this.props.name;
-        if (!pedidoId) {
-            this.notification.add(
-                "No se encontró el pedido.",
-                { type: "danger" }
-            );
-            return;
-        }
-        const url = `/web/content/rastreo.pedido/${pedidoId}/${campo}`;
-
-        window.open(url, "_blank");
-    }
-    async onPDFSeleccionado(ev) {
-        const archivo = ev.target.files[0];
-        if (!archivo) {
-            return;
-        }
-        if (
-            archivo.type !== "application/pdf" &&
-            !archivo.name.toLowerCase().endsWith(".pdf")
-        ) {
-
-            this.notification.add(
-                "Solo puedes seleccionar archivos PDF.",
-                {
-                    type: "danger",
-                }
-            );
-
-            ev.target.value = "";
-
-            return;
-        }
-        const pedidoId = this.props.record.resId;
-
-        console.log("ID del pedido:", pedidoId);
-
-        if (!pedidoId) {
-
-            this.notification.add(
-                "Primero debes guardar el pedido.",
-                {
-                    type: "warning",
-                }
-            );
-
-            return;
-        }
-        const archivoBase64 = await this.convertirPDFBase64(archivo);
-        console.log("PDF convertido correctamente");
-        const resultado = await this.orm.call(
-            "rastreo.pedido",
-            "subir_pdf",
-            [
-                this.props.name,
-                archivoBase64,
-                pedidoId
-            ]
-        );
-
-        if (resultado.success) {
-            this.notification.add(
-                "PDF agregado correctamente.",
-                {type: "success",}
-            );
-        } else {
-            this.notification.add(
-                resultado.error || "No se pudo subir el PDF.",
-                {type: "danger",}
-            );
-        }
-
-        ev.target.value = "";
-    }
-
+ 
     async cargarPedido(){
-        const pedidoId = this.props.record.resId;
+        
+    }
+
+    async onClickCambiarEstado(){
+        this.dialogService.add(ConfirmationDialog, {
+            title: _t("¿Estás seguro?"),
+            body: _t(),
+            confirm: async () => {
+                //await this.cambiarEstado();
+            },
+            cancel: () => {
+                return;
+            },
+        });
+       
+    }
+    async onClickRegresar() {
+        this.guardarBodegaActual();
+        this.onClickGuardar();
+        await this.action.doAction("rastreo_paquetes.action_pantalla_principal");
+    }
+    async cambiarEstado(){
+        const pedidoId = this.state.pedido.id
         try {
             const resultado = await this.orm.call(
                 "rastreo.pedido",
-                "obtener_pedido",
+                "cambiar_estado",
                 [pedidoId]
             );
             this.state.pedido = resultado.data ?? resultado;
@@ -118,25 +89,36 @@ export class PdfUploader extends Component {
         }
     }
 
-    convertirPDFBase64(archivo) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-             reader.onload = () => {
-                const resultado = reader.result;
-                const base64 = resultado.split(",")[1];
-                resolve(base64);
-            };
-            reader.onerror = () => {
-                reject(reader.error);
-            };
-            reader.readAsDataURL(archivo);
-        });
+    onCalcular(){
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+        }
+        this.searchTimeout = setTimeout(() => {
+            this.calcularRacks();
+        }, 500);
     }
+
+  
+
+
+  
+    async autoGuardado(){
+        await onClickGuardar;
+    }
+
+    async onClickGuardar() {
+        
+    }
+
+    
+
+    // Descargar PDF ¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿
+    async onClickDescargarPDF() {
+        
+    }
+
+
+  
 }
 
-registry.category("fields").add(
-    "rastreo_pdf_uploader",
-    {
-        component: PdfUploader,
-    }
-);
+PantallaCroquis.template = "rastreo_paquetes.detalle_pedido";

@@ -31,19 +31,29 @@ class rastreo_rack_detalle(models.Model):
         string = 'Largo del rack en milimetros'
     )
 
-
-
+    producto_id = fields.Many2one(
+        'product.product',
+        string='Producto',  
+        required=True,  
+    )
 
 
 
     @api.model
-    def guardar_rack(self, datos):
+    def guardar_rack(self, datos, producto_id):
         if not datos or not isinstance(datos, dict):
-            raise UserError("No se recibieron datos válidos")
+            raise UserError("No se recibieron datos válidos")     
+        if not producto_id:
+            raise UserError("El producto es obligatorio")
+        producto = self.env['product.product'].browse(producto_id)
+        if not producto.exists():
+            raise UserError("El cliente indicado no existe")
+                   
         usd_currency = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
         currency_id = usd_currency.id if usd_currency else False
         vals = {
             'clave': datos.get('clave', ''),
+            'producto_id': producto_id,
             'nombre': datos.get('nombre', ''),
             'precio_unitario': float(datos.get('precio_unitario', 0.0)),
             'currency_id': currency_id,
@@ -74,13 +84,19 @@ class rastreo_rack_detalle(models.Model):
 
         return{
             'success': True, 
-            'data':{
+            'data': {
+                'id':               rack.id,             
                 'clave':            rack.clave,
                 'nombre':           rack.nombre,
                 'precio_unitario':  rack.precio_unitario,
                 'altura':           rack.altura,
                 'ancho':            rack.ancho,
                 'largo':            rack.largo,
+                
+                'producto_id':      rack.producto_id.id or 0,
+                'producto_nombre':  rack.producto_id.name or '',
+                'producto_codigo':  rack.producto_id.default_code or '',
+                'producto_precio':  rack.producto_id.lst_price or 0.0,
             }
         }
     
@@ -102,17 +118,21 @@ class rastreo_rack_detalle(models.Model):
     @api.model
     def listar_productos(self, termino_busqueda):
         if not termino_busqueda:
-            return {'success': False, 'error': 'Sin termino de busqueda'}
-        domain = [          
-                    ('product.name', 'ilike', termino_busqueda),
-                ]
-        racks = self.env['stock.product'](domain, limit=100)
+            termino_busqueda = ""
+        
+        domain = [
+            ('name', 'ilike', termino_busqueda),
+            ('active', '=', True),
+        ]
+        productos = self.env['product.product'].search(domain, limit=100)
 
         lista = []
-        for r in racks:
+        for p in productos:
             lista.append({
-                'id':               r.id,
-                'nombre':            r.name
-                })
-        return {'data': lista , 'success': True,}      
-             
+                'id': p.id,
+                'nombre': p.name,
+                'codigo': p.default_code or '',
+                'precio': p.lst_price,
+                'unidad': p.uom_id.name,
+            })
+        return {'data': lista, 'success': True}

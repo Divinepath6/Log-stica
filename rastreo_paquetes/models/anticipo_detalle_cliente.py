@@ -1,7 +1,7 @@
 from odoo import models, fields
 
-class rastreo_anticipo_detalle(models.Model):
-    _name = 'rastreo.anticipo_detalle'
+class rastreo_anticipo_detalle_cliente(models.Model):
+    _name = 'rastreo.detalle_cliente'
     _description = 'Clase para guardar los anticipos de los clientes'
 
     pedido_id = fields.Many2one(
@@ -21,7 +21,6 @@ class rastreo_anticipo_detalle(models.Model):
     cantidad = fields.Monetary(
         string='Cantidad en dolares '
     )
-    
     pdf_anticipo_cliente = fields.Binary(
         string='Documento PDF',
         attachment=True

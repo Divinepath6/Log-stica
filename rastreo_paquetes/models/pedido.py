@@ -83,7 +83,7 @@ class rastreo_paquetes(models.Model):
     )
 
 
-    ##LLave foranea para lo de las actualizaciones y bodegas **************************************************
+    ##LLave foraneassssss **************************************************
     actualizacion_ids = fields.One2many(
         'rastreo.pedido_actualizacion', 
         'pedido_id',                    
@@ -94,6 +94,18 @@ class rastreo_paquetes(models.Model):
         'pedido_id',                    
         string='Id de la bodega',
     )
+    detalle_cliente_ids = fields.One2many(
+        'rastreo.detalle_proveedor', 
+        'pedido_id',                    
+        string='Detalles de los anticipos recibidos del cliente',
+    )
+    detalle_proveedor_ids = fields.One2many(
+        'rastreo.detalle_cliente', 
+        'pedido_id',                    
+        string='Detalles de los anticipos dados al proveedor',
+    )
+
+
     # =============================================================================================================
     # MÉTODOS CRUD
     # =============================================================================================================
@@ -297,3 +309,41 @@ class rastreo_paquetes(models.Model):
                 },
             })
         return lista    
+
+
+# =============================================================================================================
+# MÉTODOS CRUD detalles
+# =============================================================================================================
+    @api.model
+    def guardar_detalle_cliente(self, pedido_id,numero,datos):
+        pedido = self.browse(pedido_id)
+        if not pedido.exists():
+            return {'success': False, 'error': 'Pedido no encontrado'}
+        
+        return {'success': True, 'id': pedido.id}
+
+    @api.model
+    def eliminar_detalle_cliente(self, pedido_id):
+        pedido = self.browse(pedido_id)
+        if not pedido.exists():
+            return {'success': False, 'error': 'Pedido no encontrado'}
+        
+        pedido.unlink()
+        return {'success': True}
+    
+    @api.model
+    def guardar_detalle_proveedor(self, pedido_id,numero,datos):
+        pedido = self.browse(pedido_id)
+        if not pedido.exists():
+            return {'success': False, 'error': 'Pedido no encontrado'}
+        
+        return {'success': True, 'id': pedido.id}
+
+    @api.model
+    def eliminar_detalle_proveedor(self, pedido_id):
+        pedido = self.browse(pedido_id)
+        if not pedido.exists():
+            return {'success': False, 'error': 'Pedido no encontrado'}
+        
+        pedido.unlink()
+        return {'success': True}    

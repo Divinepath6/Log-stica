@@ -12,22 +12,19 @@ export class componente_busqueda_producto extends Component {
         confirm: { type: Function, optional: true },
         cancel: { type: Function, optional: true },
     };
-    static components = { Dialog };
-    
     setup() {
         this.orm = useService("orm");
         this.state = useState({
             productoSeleccionadoId: 0,
             termino_busqueda: "",
             productoSeleccionadoNombre: "",
+            productoSeleccionadoPrecio: "$0.00",
+            
             productos: [],
             cargando: false,
         })
         onWillStart(async () => {
-            if (this.props.action && this.props.action.params) {
-                this.listarProductos();
-            }
-            
+            this.listarProductos();
         });
     }
     
@@ -39,7 +36,11 @@ export class componente_busqueda_producto extends Component {
                 "listar_productos",
                 [this.state.termino_busqueda]
             );
-            this.state.productos = resultado
+            if(resultado.success){
+                this.state.productos = resultado.data
+            }else{
+                this.state.productos = []
+            }
         } catch (e) {
             console.error("Error al listar productos:", e);
             this.state.productos = [];
@@ -66,7 +67,8 @@ export class componente_busqueda_producto extends Component {
 
     onSeleccionarProducto(p) {
         this.state.productoSeleccionadoId = p.id;
-        this.state.productoSeleccionadoNombre = p.name;
+        this.state.productoSeleccionadoNombre = p.nombre;
+        this.state.productoSeleccionadoPrecio = p.precio;
     }
 
     _onConfirm() {
@@ -74,7 +76,11 @@ export class componente_busqueda_producto extends Component {
             return;
         }
         if (this.props.confirm) {
-            this.props.confirm(this.state.productoSeleccionadoId);
+            this.props.confirm(
+                this.state.productoSeleccionadoId,
+                this.state.productoSeleccionadoNombre,
+                this.state.productoSeleccionadoPrecio
+            );
         }
         this.props.close();
     }

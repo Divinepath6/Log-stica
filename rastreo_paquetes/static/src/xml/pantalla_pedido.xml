@@ -1,44 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<templates>
-    <t t-name="rastreo_paquetes.PdfUploader">
-        <div class="odoo-pdf-uploader">
-
-            <t t-if="state.cargando">
-                <span class="odoo-pdf-loading">
-                    <i class="fa fa-spinner fa-spin"/> Cargando datos...
-                </span>
-            </t>
-
-            <t t-else="">
-                <span t-if="state.pedido" class="odoo-pdf-badge">
-                    Guía: <t t-esc="state.pedido.numero_guia"/>
-                </span>
+<templates >
+    <t t-name="rastreo_paquetes.detalle_pedido">
+        <div class="o_rastreo_form odoo-screen">
+            
+            <div class="odoo-screen-header">
+                <div class="o_statusbar_status o_field_widget">
+                    <t t-foreach="state.estados" t-as="est" t-key="est.key">
+                        <button type="button"
+                                t-attf-class="btn btn-secondary #{state.pedido.estado == est.key ? 'active o_arrow_button_current' : 'disabled'}"
+                                t-on-click="() => ">
+                            <t t-esc="est.label"/>
+                        </button>total_cliente
+                    </t>
+                </div>
 
                 <button type="button"
-                        class="odoo-btn odoo-btn-ghost odoo-btn-sm"
-                        t-on-click="onAbrirSelectorPDF">
-                    <i class="fa fa-file-pdf-o"/>
-                    <span>
-                        <t t-if="state.pedido &amp;&amp; state.pedido[props.name]">Reemplazar PDF</t>
-                        <t t-else="">Agregar PDF</t>
-                    </span>
+                        class="odoo-btn odoo-btn-secondary"
+                        t-on-click="onClickPantallaPrincipal">
+                    <i class="fa fa-home"/> Pantalla Principal
                 </button>
+            </div>
 
-                <t t-if="state.pedido &amp;&amp; state.pedido[props.name]">
-                    <button type="button"
-                            class="odoo-btn odoo-btn-secondary odoo-btn-sm"
-                            t-on-click="onClickVerPDF">
-                        <i class="fa fa-eye"/>
-                        <span>Ver PDF</span>
-                    </button>
-                </t>
-            </t>
+            <div class="sheet">
+                
+                <div class="oe_title odoo-form-title">
+                    <label class="oe_edit_only" for="numero_guia">Número de Guía:</label>
+                    <h1>
+                        <input type="text"
+                               id="numero_guia"
+                               class="odoo-title-field form-control"
+                               placeholder="Ej. GUIA-001"
+                               t-att-value="state.pedido.numero_guia || ''"
+                               t-on-change="onInputNumeroGuia"/>
+                    </h1>
+                </div>
 
-            <input type="file"
-                   accept=".pdf,application/pdf"
-                   t-ref="selectorPDF"
-                   t-on-change="onPDFSeleccionado"
-                   class="odoo-hidden"/>
+                <div class="o_rastreo_card o_rastreo_detalles">
+                    <h3 class="o_rastreo_card_title">
+                        <i class="fa fa-info-circle"/> Detalles del pedido
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Cliente</h4>
+                            <div class="form-group">
+                                <label for="total_cliente">Total Cliente</label>
+                                <input type="number"
+                                       id="total_cliente"
+                                       class="form-control"
+                                       t-att-value="state.pedido.total_cliente || 0"
+                                       t-on-change="(ev) => this.onFieldChange('total_cliente', ev.target.value)"/>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h4>Proveedor</h4>
+                            <div class="form-group">
+                                <label for="total_proveedor">Total Proveedor</label>
+                                <input type="number"
+                                       id="total_proveedor"
+                                       class="form-control"
+                                       t-att-value="state.pedido.total_proveedor || 0"
+                                       t-on-change="(ev) => this.onFieldChange('total_proveedor', ev.target.value)"/>
+                            </div>
+                            <div class="form-group mt-2">
+                                <label for="forwarder">Forwarder</label>
+                                <input type="text"
+                                       id="forwarder"
+                                       class="form-control"
+                                       t-att-value="state.pedido.forwarder || ''"
+                                       t-on-change="(ev) => this.onFieldChange('forwarder', ev.target.value)"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_rastreo_card o_rastreo_pdfs">
+                    <h3 class="o_rastreo_card_title">
+                        <i class="fa fa-file-pdf-o"/> PDFs del pedido
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Contrato Proveedor (PDF)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="file"
+                                       accept="application/pdf"
+                                       class="form-control"
+                                       t-on-change="(ev) => this.onUploadPdf('pdf_contrato_proveedor', ev)"/>
+                                <t t-if="state.pedido.pdf_contrato_proveedor">
+                                    <a t-att-href="'/web/content?model=rastreo.pedido&amp;field=pdf_contrato_proveedor&amp;id=' + state.pedido.id"
+                                       target="_blank"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                </t>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label>Factura Proveedor (PDF)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="file"
+                                       accept="application/pdf"
+                                       class="form-control"
+                                       t-on-change="(ev) => this.onUploadPdf('pdf_factura_proveedor', ev)"/>
+                                <t t-if="state.pedido.pdf_factura_proveedor">
+                                    <a t-att-href="'/web/content?model=rastreo.pedido&amp;field=pdf_factura_proveedor&amp;id=' + state.pedido.id"
+                                       target="_blank"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="odoo-separator">Historial de actualizaciones</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>N° Actualización</th>
+                                <th>Fecha</th>
+                                <th>Detalle</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.pedido.actualizaciones || []" t-as="act" t-key="act.id">
+                                <tr>
+                                    <td><t t-esc="act.numero_actualizacion"/></td>
+                                    <td><t t-esc="act.fecha_actualizacion"/></td>
+                                    <td><t t-esc="act.actualizacion_texto"/></td>
+                                </tr>
+                            </t>
+                            <t t-if="!state.pedido.actualizaciones || state.pedido.actualizaciones.length === 0">
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">
+                                        No hay actualizaciones registradas.
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
     </t>
 </templates>

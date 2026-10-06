@@ -8,13 +8,12 @@
     'author': "Jesus Cervantes",
     'website': "https://www.yourcompany.com",
     'license': 'LGPL-3',
-    'category': 'Logística',
+    'category': 'Extra Tools',
     'version': '0.1',
     'depends': ['base', 'web', 'crm' , 'stock'],
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
-        'views/pantalla_pedido.xml',
         'reportes/creacion_croquis_reporte.xml',
     ],
     'assets': {
@@ -27,6 +26,7 @@
 
             'rastreo_paquetes/static/src/js/pantalla_pedido.js',
             'rastreo_paquetes/static/src/xml/pantalla_pedido.xml',
+            'rastreo_paquetes/static/src/xml/uploader_pantalla_pedido.xml',
 
             'rastreo_paquetes/static/src/xml/pantalla_croquis.xml',
             'rastreo_paquetes/static/src/js/pantalla_croquis.js',
@@ -47,5 +47,5 @@
         ],
     },
     'installable': True,
-    'application': True,
+    'application': True
 }

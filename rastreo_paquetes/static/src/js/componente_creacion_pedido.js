@@ -12,7 +12,7 @@ export class componente_creacion_pedido extends Component {
         confirm: { type: Function, optional: true },
         cancel: { type: Function, optional: true },
     };
-    static components = { Dialog };
+
     
     setup() {
         this.orm = useService("orm");
