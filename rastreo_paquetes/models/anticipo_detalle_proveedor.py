@@ -21,6 +21,10 @@ class rastreo_anticipo_detalle_proveedor(models.Model):
     cantidad = fields.Monetary(
         string='Cantidad en dolares '
     )
+    precio_dolar = fields.Monetary(
+        string='Precio de los dolares al momento'
+    )
+
     pdf_anticipo_proveedor = fields.Binary(
         string='Documento PDF',
         attachment=True

@@ -1,7 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_rastreo_pedido_user,rastreo.pedido.user,model_rastreo_pedido,base.group_user,1,1,1,1
 access_rastreo_pedido_actualizacion_user,rastreo.pedido_actualizacion.user,model_rastreo_pedido_actualizacion,base.group_user,1,1,1,1
-access_rastreo_anticipo_detalle,access_rastreo_anticipo_detalle,model_rastreo_anticipo_detalle,base.group_user,1,1,1,1
+access_rastreo_detalle_cliente,access_rastreo_detalle_cliente,model_rastreo_detalle_cliente,base.group_user,1,1,1,1
+access_rastreo_detalle_proveedor,access_rastreo_detalle_proveedor,model_rastreo_detalle_proveedor,base.group_user,1,1,1,1
 access_rastreo_bodega,access_rastreo_bodega,model_rastreo_bodega,base.group_user,1,1,1,1
 access_rastreo_bodega_cliente,access_rastreo_bodega_cliente,model_rastreo_bodega_cliente,base.group_user,1,1,1,1
 access_rastreo_rack_detalle,access_rastreo_rack_detalle,model_rastreo_rack_detalle,base.group_user,1,1,1,1

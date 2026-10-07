@@ -14,7 +14,7 @@ export class PantallaPedido extends Component {
             // Valores "Generales"
             pedidoId: 0,
             nombre: "",
-            Guia: "",
+            guia: "",
             clienteId: 0,
             clienteNombre: "",
             estado: "",
@@ -24,19 +24,20 @@ export class PantallaPedido extends Component {
             detalleRacks:[],
             detalleCliente: [],
             detalleProveedor: [],
+            actualizaciones: [],
 
             //bool de PDF
             forwarder: false,
             pdf_BL: false,
             pdf_PL: false,
             pdf_invoice: false,
-            pdf_contrato_proveedor:false,
-            pdf_factura_proveedor: false,
+            pdfContratoProveedor:false,
+            pdfFacturaProveedor: false,
 
             // Monedas
-            total_proveedor: 0.0,
-            total_cliente: 0.0,
-            numero_contrato: "",
+            totalProveedor: 0.0,
+            totalCliente: 0.0,
+            numeroContrato: "",
 
             
             cargando: false,
@@ -45,15 +46,39 @@ export class PantallaPedido extends Component {
         onWillStart(async () => {
             if (this.props.action && this.props.action.params) {
                 const pedidoId = this.props.action.params.pedido_id || null;
-                await this.state.cargarPedido()
                 this.state.pedidoId = pedidoId;
+                await this.state.cargarPedido()
             }
         });
         this.searchTimeout = null;
     }
  
     async cargarPedido(){
-        
+        const pedidoId = this.state.pedidoId
+        try {
+            const resultado = await this.orm.call(
+                "rastreo.pedido",
+                "cargar_pedido",
+                [pedidoId]
+            );
+            if(resultado.success){
+                const p = resultado.data;
+                this.state.guia = p.numero_guia;
+                this.state.clienteId = p.cliente_id;
+                this.state.clienteNombre = p.cliente_nombre;
+                this.state.totalCliente = p.total_cliente;
+                this.state.totalProveedor = p.total_proveedor;
+                this.state.numeroContrato = p.numero_contrato;
+                this.state.forwarder = p.forwarder;
+                this.state.pdfContratoProveedor = p.bool_contrato_proveedor;
+                this.state.pdfFacturaProveedor = p.bool_factura_proveedor;
+                this.state.numeroContrato = p.numero_contrato;
+                
+                this.state.actualizaciones = actualizaciones;
+            }
+        } finally {
+            this.state.cargando = false;
+        }
     }
 
     async onClickCambiarEstado(){
@@ -121,4 +146,4 @@ export class PantallaPedido extends Component {
   
 }
 
-PantallaCroquis.template = "rastreo_paquetes.detalle_pedido";
+PantallaPedido.template = "rastreo_paquetes.detalle_pedido";

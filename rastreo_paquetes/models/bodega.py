@@ -37,8 +37,19 @@ class rastreo_bodega(models.Model):
         string='Moneda', 
         default=lambda self: self.env.company.currency_id
     )
-    
     rack_id = fields.Char(
         string='Largo', 
         digits=(10, 2)
+    )
+    separacion_arriba = fields.Integer(
+        string='separacion_arriba'
+    )
+    separacion_abajo = fields.Integer(
+        string='separacion_abajo'
+    )
+    separacion_izquierda = fields.Integer(
+        string='separacion_izquierda'
+    )
+    separacion_derecha = fields.Integer(
+        string='separacion_derecha'
     )

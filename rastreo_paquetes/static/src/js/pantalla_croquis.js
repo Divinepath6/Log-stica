@@ -148,10 +148,10 @@ export class PantallaCroquis extends Component {
                         anchoBodega:b.ancho,
                         largoBodega: b.largo,
                         comentarios: b.descripcion,
-                        sepParedArr: 30,
-                        sepParedAba: 30,
-                        sepParedIzq: 30,
-                        sepParedDer: 30,
+                        sepParedArr: b.separacion_arriba,    
+                        sepParedAba: b.separacion_abajo, 
+                        sepParedIzq: b.separacion_izquierda,
+                        sepParedDer: b.separacion_derecha
                     }
                 });
                 if (this.state.bodegas.length === 0) {
@@ -359,6 +359,7 @@ export class PantallaCroquis extends Component {
     }
 
     async onClickGuardar() {
+        this.guardarBodegaActual();
         const idx = parseInt(this.state.rackSeleccionadoIndex, 10);
         const anchoBodega  = Number(this.state.anchoBodega) || 0;
         const largoBodega  = Number(this.state.largoBodega) || 0;
@@ -388,6 +389,10 @@ export class PantallaCroquis extends Component {
             niveles:      Math.max(1, Math.round(Number(b.alturaBodega) || 1)),
             rack_id:      b.rackSeleccionadoIndex,
             costoRack:    Number(b.rackSeleccionadoCosto) || 0,
+            separacion_arriba :     Number(b.sepParedArr),
+            separacion_abajo :      Number(b.sepParedAba),
+            separacion_izquierda :  Number(b.sepParedIzq),
+            separacion_derecha :    Number(b.sepParedDer)
         })); 
 
         const id = await this.orm.call(
@@ -474,6 +479,7 @@ export class PantallaCroquis extends Component {
             const separacionParedAba =  (Number(b.sepParedAba) || 30)/ 100;
             const separacionParedIzq =  (Number(b.sepParedIzq) || 30)/ 100;
             const separacionParedDer =  (Number(b.sepParedDer) || 30)/ 100;
+            
             console.log(separacionParedDer, separacionParedIzq, separacionParedAba, separacionParedArr )
             const [nombreRack, medidas] = this.state.rackTipos[idx];
             const [anchoRackmm, largoRackmm, altoRackmm] = medidas;
@@ -524,6 +530,11 @@ export class PantallaCroquis extends Component {
                 anchoRack:     anchoRackmm,
                 largoRack:     largoRackmm,
                 altoRack:      altoRackmm,
+
+                sepParedArr : separacionParedArr,
+                sepParedAba : separacionParedAba,
+                sepParedIzq : separacionParedIzq,
+                sepParedDer : separacionParedDer,
 
                 sobranteH: sobranteH || 0,
                 sobranteV: sobranteV || 0,

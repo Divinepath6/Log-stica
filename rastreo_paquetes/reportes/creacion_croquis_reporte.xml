@@ -154,6 +154,15 @@
                 Ancho del pasillo Vertical: <b><t t-esc="bodega['sobranteH']"/> m </b> 
                 Ancho del pasillo Horizontal: <b><t t-esc="bodega['sobranteV']"/> m </b> 
             </div>
+            <div class="texto"  >
+                Separación a paredes: <b>
+                <t t-esc="bodega['sepParedArr']"/>  
+                <t t-esc="bodega['sepParedAba']"/> 
+                <t t-esc="bodega['sepParedIzq']"/> 
+                <t t-esc="bodega['sepParedDer']"/> 
+                </b> 
+            </div>
+            
         </div>
 
         <div class="plano-marco">

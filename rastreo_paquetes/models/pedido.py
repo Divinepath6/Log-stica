@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 import base64
+from datetime import datetime
 
 class rastreo_paquetes(models.Model):
     _name = 'rastreo.pedido'
@@ -68,11 +69,7 @@ class rastreo_paquetes(models.Model):
     racks_acordados = fields.Integer(
         string = 'Total de rack acordados con el cliente'
     )
-    anticipo_ids = fields.One2many(
-        'rastreo.anticipo_detalle', 
-        'pedido_id', 
-        string='Anticipos Recibidos'
-    )
+
 
 
     ##LLave foranea para lo de clientes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -104,7 +101,7 @@ class rastreo_paquetes(models.Model):
         'pedido_id',                    
         string='Detalles de los anticipos dados al proveedor',
     )
-
+    # anticipo
 
     # =============================================================================================================
     # MÉTODOS CRUD
@@ -125,7 +122,7 @@ class rastreo_paquetes(models.Model):
         self.env['rastreo.pedido_actualizacion'].create({
             'pedido_id': pedido.id,
             'numero_actualizacion': 1,
-            'fecha_actualizacion': fields.Datetime.now(),
+            'fecha_actualizacion': datetime.now(),
             'actualizacion_texto': 'Fase inicial comenzada',
         })
         
@@ -189,9 +186,9 @@ class rastreo_paquetes(models.Model):
         pedido.write({
             nombre: archivo
         })
-
         field_obj = self._fields.get(nombre)
         nombre_amigable = field_obj.string if field_obj else nombre
+
         cantidad = self.env['rastreo.pedido_actualizacion'].search_count([
             ('pedido_id', '=', pedido_id)
         ])
@@ -199,7 +196,7 @@ class rastreo_paquetes(models.Model):
         self.env['rastreo.pedido_actualizacion'].create({
                 'pedido_id': pedido.id,
                 'numero_actualizacion': numero,
-                'fecha_actualizacion': fields.Datetime.now(),
+                'fecha_actualizacion': datetime.now(),
                 'actualizacion_texto': f'Archivo subido: {nombre_amigable} - {self.env.user.name}'
             })
         return {
@@ -229,7 +226,7 @@ class rastreo_paquetes(models.Model):
 
 
     @api.model
-    def obtener_pedido(self, pedido_id):
+    def cargar_pedido(self, pedido_id):
         pedido = self.browse(pedido_id)
 
         if not pedido.exists():
@@ -240,7 +237,6 @@ class rastreo_paquetes(models.Model):
             order='fecha_actualizacion desc',
         )
         lista_actualizaciones = []
-
         for actualizacion in actualizaciones:
             lista_actualizaciones.append({
                 'id': actualizacion.id,
@@ -248,6 +244,35 @@ class rastreo_paquetes(models.Model):
                 'fecha': actualizacion.fecha_actualizacion,
                 'texto': actualizacion.actualizacion_texto or '',
             })
+
+        anticipos_cliente = self.env['rastreo.detalle_cliente'].search(
+            [('pedido_id', '=', pedido_id)],
+            order='numero desc',
+        )
+        lista_anticipos_cliente = []
+        for a in anticipos_cliente:
+            lista_anticipos_cliente.append({
+                'numero': a.numero or 0,
+                'fecha_editado': a.fecha_editado or "",
+                'cantidad': a.cantidad or 0,
+                'precio_dolar': a.precio_dolar or 0,
+                'pdf_anticipo_cliente': bool(a.pdf_anticipo_cliente),
+            })
+        anticipos_proveedor = self.env['rastreo.detalle_proveedor'].search(
+            [('pedido_id', '=', pedido_id)],
+            order='numero desc',
+        )
+        lista_anticipos_proveedor = []
+        for a in anticipos_proveedor:
+            lista_anticipos_proveedor.append({
+                'numero': a.numero or 0,
+                'fecha_editado': a.fecha_editado or "",
+                'cantidad': a.cantidad or 0,
+                'precio_dolar': a.precio_dolar or 0,
+                'pdf_anticipo_proveedor': bool(a.pdf_anticipo_proveedor),
+            })
+        
+
 
         return {
             'success': True,
@@ -259,8 +284,9 @@ class rastreo_paquetes(models.Model):
                 'total_cliente': pedido.total_cliente or 0,
                 'total_proveedor': pedido.total_proveedor or 0,
                 'numero_contrato': pedido.numero_contrato or 0,
-                'forwarder': pedido.forwarder,
+                
                 # booleanos
+                'forwarder': bool(pedido.forwarder),
                 'bool_contrato_proveedor': bool(pedido.pdf_contrato_proveedor),
                 'bool_factura_proveedor': bool(pedido.pdf_factura_proveedor),
                 
@@ -315,12 +341,42 @@ class rastreo_paquetes(models.Model):
 # MÉTODOS CRUD detalles
 # =============================================================================================================
     @api.model
-    def guardar_detalle_cliente(self, pedido_id,numero,datos):
+    def guardar_detalle_cliente(self, pedido_id, numero, datos, pdf_anticipo_cliente=None):
         pedido = self.browse(pedido_id)
         if not pedido.exists():
             return {'success': False, 'error': 'Pedido no encontrado'}
-        
-        return {'success': True, 'id': pedido.id}
+
+        currency_id = pedido.currency_id.id or self.env.company.currency_id.id
+
+        valores = {
+            'pedido_id': pedido.id,
+            'currency_id': currency_id,
+            'fecha_editado': datetime.now(),
+            'cantidad': datos.get('cantidad') if datos else 0,
+            'precio_dolar': datos.get('precio_dolar') if datos else 0,
+        }
+
+        if pdf_anticipo_cliente:
+            valores['pdf_anticipo_cliente'] = pdf_anticipo_cliente
+
+        Detalle = self.env['rastreo.detalle_cliente']
+
+   
+        if not numero:  
+            cantidad = Detalle.search_count([('pedido_id', '=', pedido_id)])
+            valores['numero'] = cantidad + 1
+            detalle = Detalle.create(valores)
+        else:
+            detalle = Detalle.search([
+                ('pedido_id', '=', pedido_id),
+                ('numero', '=', numero),
+            ], limit=1)
+            if not detalle:
+                return {'success': False, 'error': 'Detalle no encontrado'}
+            valores['numero'] = numero
+            detalle.write(valores)
+
+        return {'success': True, 'id': detalle.id}
 
     @api.model
     def eliminar_detalle_cliente(self, pedido_id):
@@ -330,14 +386,47 @@ class rastreo_paquetes(models.Model):
         
         pedido.unlink()
         return {'success': True}
+
+
     
     @api.model
-    def guardar_detalle_proveedor(self, pedido_id,numero,datos):
+    def guardar_detalle_proveedor(self, pedido_id,numero, datos, pdf_anticipo_proveedor=None):
         pedido = self.browse(pedido_id)
         if not pedido.exists():
             return {'success': False, 'error': 'Pedido no encontrado'}
-        
-        return {'success': True, 'id': pedido.id}
+
+        currency_id = pedido.currency_id.id or self.env.company.currency_id.id
+
+        valores = {
+            'pedido_id': pedido.id,
+            'currency_id': currency_id,
+            'fecha_editado': datetime.now(),
+            'cantidad': datos.get('cantidad') if datos else 0,
+            'precio_dolar': datos.get('precio_dolar') if datos else 0,
+        }
+
+        if pdf_anticipo_proveedor:
+            valores['pdf_anticipo_proveedor'] = pdf_anticipo_proveedor
+
+        Detalle = self.env['rastreo.detalle_proveedor']
+
+   
+        if not numero:  
+            cantidad = Detalle.search_count([('pedido_id', '=', pedido_id)])
+            valores['numero'] = cantidad + 1
+            detalle = Detalle.create(valores)
+        else:
+            detalle = Detalle.search([
+                ('pedido_id', '=', pedido_id),
+                ('numero', '=', numero),
+            ], limit=1)
+            if not detalle:
+                return {'success': False, 'error': 'Detalle no encontrado'}
+            valores['numero'] = numero
+            detalle.write(valores)
+
+        return {'success': True, 'id': detalle.id}
+
 
     @api.model
     def eliminar_detalle_proveedor(self, pedido_id):
