@@ -21,6 +21,10 @@ class rastreo_rack_detalle(models.Model):
         string='Moneda', 
         default=lambda self: self.env.company.currency_id
     )
+    cotizacion_id = fields.One2many(
+        'rastreo.cotizacion_detalle', 
+        'rack_id',  
+    )
     altura = fields.Integer(
         string = 'Altura del rack en milimetros'
     )
@@ -30,7 +34,9 @@ class rastreo_rack_detalle(models.Model):
     largo = fields.Integer(
         string = 'Largo del rack en milimetros'
     )
-
+    almacenaje = fields.Integer(
+        string = 'Almacenaje por rack'
+    )
     producto_id = fields.Many2one(
         'product.product',
         string='Producto',  
@@ -40,7 +46,7 @@ class rastreo_rack_detalle(models.Model):
 
 
     @api.model
-    def guardar_rack(self, datos, producto_id):
+    def guardar_rack(self, producto_id, datos ):
         if not datos or not isinstance(datos, dict):
             raise UserError("No se recibieron datos válidos")     
         if not producto_id:
@@ -52,14 +58,15 @@ class rastreo_rack_detalle(models.Model):
         usd_currency = self.env['res.currency'].search([('name', '=', 'USD')], limit=1)
         currency_id = usd_currency.id if usd_currency else False
         vals = {
-            'clave': datos.get('clave', ''),
-            'producto_id': producto_id,
-            'nombre': datos.get('nombre', ''),
-            'precio_unitario': float(datos.get('precio_unitario', 0.0)),
-            'currency_id': currency_id,
-            'altura': float(datos.get('altura', 0)),
-            'ancho': float(datos.get('ancho', 0)),
-            'largo': float(datos.get('largo', 0)),
+            'clave':            datos.get('clave', ''),
+            'producto_id':      producto_id,
+            'nombre':           datos.get('nombre', ''),
+            'precio_unitario':  float(datos.get('precio_unitario', 0.0)),
+            'currency_id':      currency_id,
+            'altura':           float(datos.get('altura', 0.0)),
+            'ancho':            float(datos.get('ancho', 0.0)),
+            'largo':            float(datos.get('largo', 0.0)),
+            'almacenaje':       int(datos.get('almacenaje',0))
         }
         rack_id = datos.get('id')
         if rack_id:
@@ -92,11 +99,11 @@ class rastreo_rack_detalle(models.Model):
                 'altura':           rack.altura,
                 'ancho':            rack.ancho,
                 'largo':            rack.largo,
-                
                 'producto_id':      rack.producto_id.id or 0,
                 'producto_nombre':  rack.producto_id.name or '',
                 'producto_codigo':  rack.producto_id.default_code or '',
                 'producto_precio':  rack.producto_id.lst_price or 0.0,
+                'almacenaje':       rack.almacenaje
             }
         }
     
@@ -111,7 +118,8 @@ class rastreo_rack_detalle(models.Model):
                 'clave':            r.clave,
                 'nombre':           r.nombre,
                 'precio_unitario':  r.precio_unitario,
-                'medidas': [r.ancho, r.largo, r.altura]
+                'medidas': [r.ancho, r.largo, r.altura],
+                'almacenaje':       r.almacenaje,
                 })
         return {'data': lista , 'success': True,}   
     

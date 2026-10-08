@@ -3,7 +3,9 @@ from odoo import models, fields
 class rastreo_anticipo_detalle_cliente(models.Model):
     _name = 'rastreo.detalle_cliente'
     _description = 'Clase para guardar los anticipos de los clientes'
-
+    numero = fields.Integer(
+        string='Numero de anticipo'
+    )    
     pedido_id = fields.Many2one(
         'rastreo.pedido', 
         string='Pedido', 

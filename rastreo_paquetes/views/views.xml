@@ -10,11 +10,9 @@
             <field name="name">Creación de Croquis</field>
             <field name="tag">rastreo_paquetes.pantalla_croquis</field>
         </record>
-        <record id="action_rastreo_pedido" model="ir.actions.act_window">
-            <field name="name">Pedido</field>
-            <field name="res_model">rastreo.pedido</field>
-            <field name="view_mode">form</field>
-            <field name="context">{'no_breadcrumbs': True}</field>
+        <record id="action_pantalla_pedido" model="ir.actions.client">
+            <field name="name">Pantalla Pedido</field>
+            <field name="tag">rastreo_paquetes.pantalla_pedido</field>
         </record>
 
 

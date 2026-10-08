@@ -61,7 +61,8 @@ class rastreo_bodega_cliente(models.Model):
                     'separacion_arriba' : int(b.get('separacion_arriba') or 30),
                     'separacion_abajo' : int(b.get('separacion_abajo') or 30),
                     'separacion_izquierda' : int(b.get('separacion_izquierda') or 30),
-                    'separacion_derecha' : int(b.get('separacion_derecha') or 30)
+                    'separacion_derecha' : int(b.get('separacion_derecha') or 30),
+                    'racks_ocupados': int(b.get('racks_ocupados') or 0)
                 })
 
         return {
@@ -104,7 +105,8 @@ class rastreo_bodega_cliente(models.Model):
                 'separacion_arriba' : int(b.separacion_arriba or 30),
                 'separacion_abajo' : int(b.separacion_abajo or 30),
                 'separacion_izquierda' : int(b.separacion_izquierda or 30),
-                'separacion_derecha' : int(b.separacion_derecha or 30)
+                'separacion_derecha' : int(b.separacion_derecha or 30),
+                'racks_ocupados': int(b.racks_ocupados or 0)
             })
         return {
                 'success': True,

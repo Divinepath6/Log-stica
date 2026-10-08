@@ -101,7 +101,7 @@
                         </div>
                     </div>
 
-                    <div class="texto">
+                    <div class="texto" style="margin-bottom: 1px;">
                         <b>Cliente:</b> <t t-esc="datos.get('clienteNombre', '')"/> 
                         <b>Ubicaci&#243;n:</b> <t t-esc="datos.get('ubicacion', '')"/>
                     </div>
@@ -149,6 +149,9 @@
             </div>
             <div class="texto"  >
                 Rack: <b><t t-esc="bodega['rackNombre']"/> </b> 
+            </div>
+            <div class="texto"  >
+                Almacenaje Total con rack (Toneladas): <b><t t-esc="bodega['almacenaje']"/> </b> 
             </div>
             <div class="texto"  >
                 Ancho del pasillo Vertical: <b><t t-esc="bodega['sobranteH']"/> m </b> 

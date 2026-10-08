@@ -1,4 +1,5 @@
 /** @odoo-module **/
+import { registry } from "@web/core/registry";
 import { Component, useState, onWillStart } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
@@ -47,14 +48,14 @@ export class PantallaPedido extends Component {
             if (this.props.action && this.props.action.params) {
                 const pedidoId = this.props.action.params.pedido_id || null;
                 this.state.pedidoId = pedidoId;
-                await this.state.cargarPedido()
+                await this.cargarPedido()
             }
         });
         this.searchTimeout = null;
     }
  
     async cargarPedido(){
-        const pedidoId = this.state.pedidoId
+        const pedidoId = this.state.pedidoId;
         try {
             const resultado = await this.orm.call(
                 "rastreo.pedido",
@@ -64,17 +65,24 @@ export class PantallaPedido extends Component {
             if(resultado.success){
                 const p = resultado.data;
                 this.state.guia = p.numero_guia;
+                this.state.estado = p.estado;
                 this.state.clienteId = p.cliente_id;
                 this.state.clienteNombre = p.cliente_nombre;
                 this.state.totalCliente = p.total_cliente;
                 this.state.totalProveedor = p.total_proveedor;
                 this.state.numeroContrato = p.numero_contrato;
+                //bool
                 this.state.forwarder = p.forwarder;
                 this.state.pdfContratoProveedor = p.bool_contrato_proveedor;
                 this.state.pdfFacturaProveedor = p.bool_factura_proveedor;
                 this.state.numeroContrato = p.numero_contrato;
+                //listas
+                this.state.actualizaciones = p.actualizaciones;
+                this.state.detalleRacks = p.detalle_racks || [];
+                this.state.detalleCliente= p.detalle_cliente || [];
+                this.state.detalleProveedor= p.detalle_proveedor || [];
+            }else{
                 
-                this.state.actualizaciones = actualizaciones;
             }
         } finally {
             this.state.cargando = false;
@@ -84,7 +92,7 @@ export class PantallaPedido extends Component {
     async onClickCambiarEstado(){
         this.dialogService.add(ConfirmationDialog, {
             title: _t("¿Estás seguro?"),
-            body: _t(),
+            body: _t(this.state.guia),
             confirm: async () => {
                 //await this.cambiarEstado();
             },
@@ -146,4 +154,5 @@ export class PantallaPedido extends Component {
   
 }
 
-PantallaPedido.template = "rastreo_paquetes.detalle_pedido";
+PantallaPedido.template = "rastreo_paquetes.pantalla_pedido";
+registry.category("actions").add("rastreo_paquetes.pantalla_pedido", PantallaPedido);

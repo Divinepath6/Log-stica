@@ -93,6 +93,13 @@
                                    class="form-control" 
                                    t-model.number="state.altura"/>
                         </div>
+                        <div class="col-md-6">
+                            <label for="almacenaje" class="form-label fw-bold">Almacenaje (Tonelada)</label>
+                            <input type="number" 
+                                   id="almacenaje" 
+                                   class="form-control" 
+                                   t-model.number="state.almacenaje"/>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">

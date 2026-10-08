@@ -101,8 +101,13 @@ class rastreo_paquetes(models.Model):
         'pedido_id',                    
         string='Detalles de los anticipos dados al proveedor',
     )
+    detalle_cotizacion_ids = fields.One2many(
+        'rastreo.cotizacion_detalle', 
+        'pedido_id',                    
+        string='Detalles de la cotización',
+    )
+    
     # anticipo
-
     # =============================================================================================================
     # MÉTODOS CRUD
     # =============================================================================================================
@@ -271,13 +276,26 @@ class rastreo_paquetes(models.Model):
                 'precio_dolar': a.precio_dolar or 0,
                 'pdf_anticipo_proveedor': bool(a.pdf_anticipo_proveedor),
             })
-        
-
-
+        cotizacion_detalle = self.env['rastreo.cotizacion_detalle'].search(
+            [('pedido_id', '=', pedido_id)],
+            order='numero desc',
+        )        
+        lista_cotizacion_detalle = []
+        for a in cotizacion_detalle:
+            lista_cotizacion_detalle.append({
+                'numero': a.numero or 0,
+                'costo_rack': a.costo_rack or 0,
+                'rack_id': a.rack_id or 0,
+                'rack_nombre': a.rack_id.nombre or 0,
+                'cantidad_racks': a.cantidad_racks or 0,
+                'pdf_anticipo_proveedor': bool(a.pdf_anticipo_proveedor),
+            })
+         
         return {
             'success': True,
             'data': {
                 'id': pedido.id,
+                'estado': pedido.estado,
                 'numero_guia': pedido.numero_guia or '',
                 'cliente_id': pedido.cliente_id.id if pedido.cliente_id else None,
                 'cliente_nombre': pedido.cliente_id.name if pedido.cliente_id else '',
@@ -289,9 +307,11 @@ class rastreo_paquetes(models.Model):
                 'forwarder': bool(pedido.forwarder),
                 'bool_contrato_proveedor': bool(pedido.pdf_contrato_proveedor),
                 'bool_factura_proveedor': bool(pedido.pdf_factura_proveedor),
-                
-                'numero_contrato': pedido.numero_contrato or '',
+                #listas
+                'lista_anticipos_cliente': lista_anticipos_cliente,
+                'lista_anticipos_proveedor': lista_anticipos_proveedor,
                 'actualizaciones': lista_actualizaciones,
+                'detalle_racks': lista_cotizacion_detalle
             }
         }
 
@@ -436,3 +456,42 @@ class rastreo_paquetes(models.Model):
         
         pedido.unlink()
         return {'success': True}    
+
+
+
+
+
+
+
+    @api.model
+    def guardar_detalle_cotizacion(self, pedido_id):
+        pedido = self.browse(pedido_id)
+        if not pedido.exists():
+            return {'success': False, 'error': 'Pedido no encontrado'}
+
+        currency_id = pedido.currency_id.id or self.env.company.currency_id.id
+        bodega = self.env['rastreo.bodega_cliente'].search(
+            [('pedido_id', '=', pedido_id)],
+            limit=1
+        )
+        if not bodega.exists():
+            return {'success': False, 'error': 'Bodega no encontrada'}
+        bodegas = self.env['rastreo.bodega'].search(
+            [('bodega_cliente_id', '=', bodega.id)],
+            order='numero_bodega',
+        )
+        if not bodegas.exists():
+            return {'success': False, 'error': 'Bodegas no guardadas'}
+        
+        detalle = self.env['rastreo.cotizacion_detalle']
+        for b in bodegas:
+            detalle.create({
+                'numero': b.numero_bodega or 0,
+                'costo_rack': b.costoRack or 0.0,
+                'rack_id': int(b.rack_id or 0),
+                'currency_id': currency_id,
+                'cantidad_racks': int(b.racks_ocupados or 0),
+                'pedido_id': pedido_id
+            })       
+
+        return {'success': True, 'id': pedido_id}

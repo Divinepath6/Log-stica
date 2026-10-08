@@ -26,10 +26,12 @@ export class componente_edicion_racks extends Component{
             rackSeleccionadoId: 0,
             clave: "",
             nombre: "",
+            //coma flotante recordatorio
             precioUnitario: 0.0,
             altura: 0,
             ancho: 0,
             largo: 0,
+            almacenaje: 0,
 
             //producto seleccionado
             productoId: "",
@@ -77,13 +79,14 @@ export class componente_edicion_racks extends Component{
             altura: this.state.altura,
             ancho: this.state.ancho,
             largo: this.state.largo,
+            almacenaje: this.state.almacenaje * 1000
         };
         const resultado = await this.orm.call(
             "rastreo.rack_detalle", 
             "guardar_rack",
             [
-                datos,
-                this.state.productoId
+                this.state.productoId,
+                datos
             ]
         );
         if(resultado.success){
@@ -98,6 +101,7 @@ export class componente_edicion_racks extends Component{
             this.state.productoId = 0;
             this.state.productoNombre = "";
             this.state.productoPrecio = 0;
+            this.state.almacenaje = 0.0;
         }else{
             this.notification.add(
                 "Hubo un error, intentelo mas tarde",
@@ -125,6 +129,7 @@ export class componente_edicion_racks extends Component{
             this.state.productoId = r.producto_id;
             this.state.productoPrecio = r.producto_precio.toFixed(2);
             this.state.productoNombre = r.producto_nombre;
+            this.state.almacenaje = (r.almacenaje/1000).toFixed(3);
             this.state.editando = true;
         }else{
             this.notification.add(
@@ -163,6 +168,9 @@ export class componente_edicion_racks extends Component{
         this.state.altura = 0;
         this.state.ancho = 0;
         this.state.largo = 0;
+        this.state.productoId = 0;
+        this.state.productoNombre = "";
+        this.state.productoPrecio = 0;
     }
 
     onCrearNuevo() {

@@ -71,6 +71,12 @@
                                    t-model="state.rackSeleccionadoCosto"
                                    t-on-change="onCalcular"/>
                         </div>
+                        <div class="odoo-field">
+                            <label for="almacenaje" class="form-label fw-bold"> Almacenaje: </label>
+                            <span type="number"
+                                    placeholder="0.00"
+                                   t-esc="state.rackSeleccionadoAlmacenaje"/>
+                        </div>
                     </div>
 
                     <div class="cc-card">
@@ -185,7 +191,7 @@
 
                         <div class="odoo-result-row">
                             <span class="odoo-result-label">Almacenaje con rack por tonelada:</span>
-                            <span class="odoo-result-value" t-esc="state.almacenajeTonelada or '$0.00'"/>
+                            <span class="odoo-result-value" t-esc="state.almacenajeTonelada or '0.00'"/>
                         </div>
                     </div>
 
@@ -235,6 +241,7 @@
                                 sepParedAba="state.sepParedAba"
                                 sepParedIzq="state.sepParedIzq"
                                 sepParedDer="state.sepParedDer"
+                                almacenaje="state.rackSeleccionadoAlmacenaje"
                             />
                         </div>
                     </div>

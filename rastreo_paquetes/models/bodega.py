@@ -53,3 +53,6 @@ class rastreo_bodega(models.Model):
     separacion_derecha = fields.Integer(
         string='separacion_derecha'
     )
+    racks_ocupados = fields.Integer(
+        string='Cantidad de racks ocupados totales'
+    )

@@ -57,10 +57,9 @@ export class PantallaPrincipal extends Component {
             });
         }else{
             await this.action.doAction({
-            type: "ir.actions.act_window",
-            res_model: "rastreo.pedido",
-            views: [[false, "form"]],
-            res_id: p.id,
+            type: "ir.actions.client",
+            tag: "rastreo_paquetes.pantalla_pedido",
+            params: { pedido_id: p.id , cliente_id : p.clienteId },  
             target: "current",
             });
         }
