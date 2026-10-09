@@ -283,12 +283,12 @@ class rastreo_paquetes(models.Model):
         lista_cotizacion_detalle = []
         for a in cotizacion_detalle:
             lista_cotizacion_detalle.append({
+                'clave': a.rack_id.clave or "",
                 'numero': a.numero or 0,
                 'costo_rack': a.costo_rack or 0,
-                'rack_id': a.rack_id or 0,
+                'rack_id': a.rack_id.id or 0,
                 'rack_nombre': a.rack_id.nombre or 0,
                 'cantidad_racks': a.cantidad_racks or 0,
-                'pdf_anticipo_proveedor': bool(a.pdf_anticipo_proveedor),
             })
          
         return {
@@ -484,13 +484,15 @@ class rastreo_paquetes(models.Model):
             return {'success': False, 'error': 'Bodegas no guardadas'}
         
         detalle = self.env['rastreo.cotizacion_detalle']
+        detalle.search([('pedido_id', '=', pedido_id)]).unlink()
+
         for b in bodegas:
             detalle.create({
                 'numero': b.numero_bodega or 0,
                 'costo_rack': b.costoRack or 0.0,
-                'rack_id': int(b.rack_id or 0),
+                'rack_id': b.rack_id.id if b.rack_id else False,
                 'currency_id': currency_id,
-                'cantidad_racks': int(b.racks_ocupados or 0),
+                'cantidad_racks': b.racks_ocupados or 0,
                 'pedido_id': pedido_id
             })       
 

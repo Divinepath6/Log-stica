@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="rastreo_paquetes.componente_detalle_racks_embed">
+       <Dialog title="'Editar el detalle'" size="'md'">
+            <button class="btn btn-primary" t-on-click="onBuscarRack">
+                    <i class="oi oi-check me-1"/> Buscar Producto
+            </button> 
+            
+                <div class="o_form_view p-2 border rounded bg-light">
+                    <div class="row g-3">
+                        
+                        <div class="col-md-6">
+                            <label for="clave" class="form-label fw-bold">Clave del rack:</label>
+                            <span type="text" 
+                                   id="clave" 
+                                   class="form-control" 
+                                   t-esc="state.rackClave"/>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="nombre" class="form-label fw-bold">Nombre del Rack:</label>
+                            <span type="text" 
+                                   id="nombre" 
+                                   class="form-control" 
+                                   t-esc="state.rackNombre"/>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="precio" class="form-label fw-bold">Precio Unitario ($)</label>
+                            <input type="number" 
+                                   step="0.01" 
+                                   id="precio" 
+                                   class="form-control" 
+                                   t-model.number="state.precioUnitario"/>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <label for="cantidad" class="form-label fw-bold"> Cantidad de Racks:</label>
+                            <input type="number" 
+                                   step="1" 
+                                   id="cantidad" 
+                                   class="form-control" 
+                                   t-model.number="state.cantidadRacks"/>
+                        </div>
+
+                         <div class="col-md-6">
+                            <label for="total" class="form-label fw-bold">Total:</label>
+                            <span type="text" 
+                                   id="total" 
+                                   class="form-control" 
+                                   t-esc="state.costoTotal"/>
+                        </div>
+                        
+                    </div>
+
+                </div>
+   
+
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary" t-on-click="onGuardar">
+                    Guardar y salir
+                </button>
+                <button class="btn btn-secondary" t-on-click="onCancelarEdicion">
+                    Cancelar
+                </button>
+            </t>
+        </Dialog>
+
+    </t>
+</templates>
+
+
+        

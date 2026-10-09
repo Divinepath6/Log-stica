@@ -13,7 +13,7 @@ export class PdfUploader extends Component {
         this.notification = useService("notification");
         this.pdfInput = useRef("selectorPDF");
         this.state = useState({
-            pedido: null,
+            archivo: null,
             cargando: true,
         })
         onWillStart( async () =>{
@@ -36,9 +36,9 @@ export class PdfUploader extends Component {
             return;
         }
         const url = `/web/content/rastreo.pedido/${pedidoId}/${campo}`;
-
         window.open(url, "_blank");
     }
+
     async onPDFSeleccionado(ev) {
         const archivo = ev.target.files[0];
         if (!archivo) {
@@ -60,8 +60,16 @@ export class PdfUploader extends Component {
 
             return;
         }
-        const pedidoId = this.props.record.resId;
+        this.state.archivo = archivoBase64
+    
+    
+        const archivoBase64 = await this.convertirPDFBase64(archivo);
+        
 
+        ev.target.value = "";
+    }
+    async guardarPDF(){
+        const pedidoId = this.props.record.resId;
         if (!pedidoId) {
 
             this.notification.add(
@@ -70,10 +78,8 @@ export class PdfUploader extends Component {
                     type: "warning",
                 }
             );
-
             return;
         }
-        const archivoBase64 = await this.convertirPDFBase64(archivo);
         const resultado = await this.orm.call(
             "rastreo.pedido",
             "subir_pdf",
@@ -95,25 +101,7 @@ export class PdfUploader extends Component {
                 {type: "danger",}
             );
         }
-
-        ev.target.value = "";
     }
-
-    async cargarPedido(){
-        const pedidoId = this.props.record.resId;
-        try {
-            const resultado = await this.orm.call(
-                "rastreo.pedido",
-                "obtener_pedido",
-                [pedidoId]
-            );
-            this.state.pedido = resultado.data ?? resultado;
-
-        } finally {
-            this.state.cargando = false;
-        }
-    }
-
     convertirPDFBase64(archivo) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();

@@ -26,6 +26,7 @@ export class componente_edicion_racks extends Component{
             rackSeleccionadoId: 0,
             clave: "",
             nombre: "",
+            
             //coma flotante recordatorio
             precioUnitario: 0.0,
             altura: 0,

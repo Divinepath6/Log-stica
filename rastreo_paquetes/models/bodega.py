@@ -24,8 +24,8 @@ class rastreo_bodega(models.Model):
         string='Largo', 
         digits=(10, 2)
     )
-    niveles = fields.Char(
-        string='Largo', 
+    niveles = fields.Float(
+        string='Niveles', 
         digits=(10, 2)
     )
     costoRack = fields.Monetary(
@@ -37,10 +37,12 @@ class rastreo_bodega(models.Model):
         string='Moneda', 
         default=lambda self: self.env.company.currency_id
     )
-    rack_id = fields.Char(
-        string='Largo', 
-        digits=(10, 2)
+    rack_id = fields.Many2one(
+        'rastreo.rack_detalle',
+        string='Rack',  
+        required=True,  
     )
+
     separacion_arriba = fields.Integer(
         string='separacion_arriba'
     )

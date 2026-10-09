@@ -57,7 +57,7 @@ class rastreo_bodega_cliente(models.Model):
                     'largo': float(b.get('largo') or 0.0),
                     'niveles': int(b.get('niveles') or 0),
                     'costoRack': float(b.get('costoRack') or 0.0),
-                    'rack_id': int(b.get('rack_id') or 0),
+                    'rack_id': int(b.get('rack_id')) if b.get('rack_id') else False,
                     'separacion_arriba' : int(b.get('separacion_arriba') or 30),
                     'separacion_abajo' : int(b.get('separacion_abajo') or 30),
                     'separacion_izquierda' : int(b.get('separacion_izquierda') or 30),

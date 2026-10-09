@@ -44,6 +44,14 @@
 
             'rastreo_paquetes/static/src/js/componente_busqueda_producto.js',
             'rastreo_paquetes/static/src/xml/componente_busqueda_producto.xml',
+
+            'rastreo_paquetes/static/src/xml/componente_detalle_racks.xml',
+            'rastreo_paquetes/static/src/xml/componente_detalle_cliente.xml',
+            'rastreo_paquetes/static/src/xml/componente_detalle_proveedor.xml',
+            
+            'rastreo_paquetes/static/src/js/componente_detalle_racks.js',
+            'rastreo_paquetes/static/src/js/componente_detalle_cliente.js',
+            'rastreo_paquetes/static/src/js/componente_detalle_proveedor.js',
         ],
     },
     'installable': True,

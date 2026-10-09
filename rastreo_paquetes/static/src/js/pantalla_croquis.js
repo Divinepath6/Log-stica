@@ -131,7 +131,9 @@ export class PantallaCroquis extends Component {
         this.state.bodegas[this.state.bodegaIndex] = bodega;
     }
   
+    buscarRackPorId(id){
 
+    }
      async cargarBodegaDB(){
         try {
             const resultado = await this.orm.call(
@@ -144,7 +146,7 @@ export class PantallaCroquis extends Component {
                 const bodegas = resultado.data.bodegas
                 this.state.bodegas = bodegas.map( b => {
                     return {
-                        rackSeleccionadoIndex: b.rack_id,
+                        rackSeleccionadoIndex: buscarRackPorId(b.rack_id),
                         rackSeleccionadoCosto:b.costoRack,
                         alturaBodega:b.niveles,
                         anchoBodega:b.ancho,
@@ -220,9 +222,9 @@ export class PantallaCroquis extends Component {
                 "listar_racks",
             );
             if(resultado.success){
-                this.state.rackTipos = resultado.data.map((r,i) =>{
-                    return [r.nombre, r.medidas, r.precio_unitario, (r.almacenaje/1000)]
-                })
+                this.state.rackTipos = resultado.data.map((r) => {
+                return [r.nombre, r.medidas, r.precio_unitario, (r.almacenaje/1000), r.id];
+                });
             }else{
                this.state.rackTipos = []
             }
@@ -237,9 +239,14 @@ export class PantallaCroquis extends Component {
             body: _t("El cliente acepto la propuesta? ¿Desea continuar?"),
             confirm: async () => {
                 this.guardarBodegaActual();
-                await this.onClickGuardar()
-                r = await this.guardar_detalle();
+                const r1 = await this.onClickGuardar()
+                if(r1.success === false){
+                    this.notification.add("Ha habido un error al guardar", { type: "warning" });
+                    return
+                }
+                const r = await this.guardarDetalle();
                 if(r.success === false){
+                    this.notification.add("Ha habido un error cambiar de estado", { type: "warning" });
                     return
                 }
                 await this.cambiarEstado();
@@ -256,7 +263,7 @@ export class PantallaCroquis extends Component {
         this.onClickGuardar();
         await this.action.doAction("rastreo_paquetes.action_pantalla_principal");
     }
-    async guardar_detalle(){
+    async guardarDetalle(){
         const pedidoId = this.state.pedidoId
         try {
             const resultado = await this.orm.call(
@@ -266,7 +273,12 @@ export class PantallaCroquis extends Component {
             );
             return resultado
         } catch(e){
-            
+           console.error("Error en guardar_detalle_cotizacion:", e);
+                this.notification.add(
+                    e?.message || "Error al guardar detalle",
+                    { type: "danger" }
+                );
+                return { success: false };
         }
     }
     async cambiarEstado(){
@@ -355,7 +367,7 @@ export class PantallaCroquis extends Component {
 
         this.state.racksOcupados  = porAncho * porLargo * altoBodega;
         this.state.costoEstimado  = `$${(costo * this.state.racksOcupados).toFixed(2)}`;
-        this.state.almacenajeTonelada = this.state.racksOcupados * this.state.rackSeleccionadoAlmacenaje;
+        this.state.almacenajeTonelada = (this.state.racksOcupados * this.state.rackSeleccionadoAlmacenaje).toFixed(3);
 
         this.state.anchoRack      = anchoRackM;   // m
         this.state.largoRack      = largoRackM;   // m
@@ -387,7 +399,7 @@ export class PantallaCroquis extends Component {
 
     async onClickGuardar() {
         this.guardarBodegaActual();
-        const idx = parseInt(this.state.rackSeleccionadoIndex, 10);
+        const idx = parseInt(this.state.rackSeleccionadoIndex , 10);
         const anchoBodega  = Number(this.state.anchoBodega) || 0;
         const largoBodega  = Number(this.state.largoBodega) || 0;
         let altoBodega   = Number(this.state.alturaBodega) || 1;
@@ -408,21 +420,27 @@ export class PantallaCroquis extends Component {
             altoBodega = 1;
         }
         
-        const bodegas = this.state.bodegas.map((b, i) => ({
-            descripcion:  b.comentarios,
-            numero_bodega: i + 1,
-            ancho:        Number(b.anchoBodega) || 0,
-            largo:        Number(b.largoBodega) || 0,
-            niveles:      Math.max(1, Math.round(Number(b.alturaBodega) || 1)),
-            rack_id:      b.rackSeleccionadoIndex,
-            costoRack:    Number(b.rackSeleccionadoCosto) || 0,
-            separacion_arriba :     Number(b.sepParedArr),
-            separacion_abajo :      Number(b.sepParedAba),
-            separacion_izquierda :  Number(b.sepParedIzq),
-            separacion_derecha :    Number(b.sepParedDer)
-        })); 
+        const bodegas = this.state.bodegas.map((b, i) => { 
+            const idx = parseInt(b.rackSeleccionadoIndex, 10);
+            const rackData = this.state.rackTipos[idx];
+            const rackId = rackData ? rackData[4] : false;
+            return{
+                descripcion:  b.comentarios,
+                numero_bodega: i + 1,
+                ancho:        Number(b.anchoBodega) || 0,
+                largo:        Number(b.largoBodega) || 0,
+                niveles:      Math.max(1, Math.round(Number(b.alturaBodega) || 1)),
+                rack_id:      rackId,
+                costoRack:    Number(b.rackSeleccionadoCosto) || 0,
+                separacion_arriba :     Number(b.sepParedArr),
+                separacion_abajo :      Number(b.sepParedAba),
+                separacion_izquierda :  Number(b.sepParedIzq),
+                separacion_derecha :    Number(b.sepParedDer),
+                racks_ocupados:         Number(b.racksOcupados)
+            }
+            }); 
 
-        const id = await this.orm.call(
+        const r = await this.orm.call(
             "rastreo.bodega_cliente", 
             "guardar_bodega",
             [
@@ -431,8 +449,11 @@ export class PantallaCroquis extends Component {
                 bodegas
             ]
         );
-        if(id != 0){
+        if(r.id != 0){
             this.notification.add( `Guardado exitoso `, { type: "success" });
+            return r;
+        }else{
+            return r;
         }
     }
 

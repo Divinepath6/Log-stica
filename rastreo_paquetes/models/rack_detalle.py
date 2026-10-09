@@ -43,7 +43,10 @@ class rastreo_rack_detalle(models.Model):
         required=True,  
     )
 
-
+    cotizacion_id = fields.One2many(
+        'rastreo.cotizacion_detalle', 
+        'rack_id',                    
+    )
 
     @api.model
     def guardar_rack(self, producto_id, datos ):

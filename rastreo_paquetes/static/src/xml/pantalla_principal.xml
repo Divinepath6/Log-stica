@@ -4,7 +4,7 @@
         <div class="odoo-screen odoo-dashboard">
 
             <div class="odoo-screen-header">
-                <h2>Logística</h2>
+                <h2>LOGÍSTICA</h2>
 
                 <div class="odoo-search-box">
                     <i class="fa fa-search odoo-search-icon"/>
@@ -60,6 +60,11 @@
                                     class="odoo-btn odoo-btn-primary odoo-btn-sm"
                                     t-on-click="() => this.onClickEditarPedido(p)">
                                 <i class="fa fa-pencil"/> Editar
+                            </button>
+                            <button type="button"
+                                    class="odoo-btn odoo-btn-primary odoo-btn-sm"
+                                    t-on-click="() => this.onClickEliminarPedido(p)">
+                                <i class="fa fa-close"/> Eliminar
                             </button>
                         </div>
 

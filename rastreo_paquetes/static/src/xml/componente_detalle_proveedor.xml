@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="rastreo_paquetes.componente_detalle_proveedor_embed">
+        <Dialog title="'Editar el anticipo del proveedor ' state.numeroAnticipo" size="'md'">
+                <div class="o_form_view p-2 border rounded bg-light">
+                    <div class="row g-3">
+                        
+                        <div class="col-md-6">
+                            <label for="numero" class="form-label fw-bold">Número: </label>
+                            <span type="text" 
+                                   id="numero" 
+                                   class="form-control" 
+                                   t-esc="state.numeroAnticipo"/>
+                        </div>
+	
+
+                        <div class="col-md-6">
+                            <label for="fecha" class="form-label fw-bold">ultima Fecha edición:</label>
+                            <span type="text" 
+                                   id="fecha" 
+                                   class="form-control" 
+                                   t-esc="state.fechaAnticipo"/>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="precio" class="form-label fw-bold">Cantidad dada al proveedor ($):</label>
+                            <input type="number" 
+                                   step="0.1" 
+                                   id="precio" 
+                                   class="form-control" 
+                                   t-model.number="state.cantidadAnticipo"/>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <label for="dolar" class="form-label fw-bold"> Precio dólar ($):</label>
+                            <input type="number" 
+                                   step="0.1" 
+                                   id="dolar" 
+                                   class="form-control" 
+                                   t-model.number="state.cantidadRacks"/>
+                        </div>
+                
+                        <div class="col-md-6">
+                            <!--Subir PDF anticipo-->
+                        </div>
+                        <div class="col-md-6">
+                            <!--Ver PDF del anticipo si existe-->
+                        </div>
+                    </div>
+
+                </div>
+   
+
+
+            <t t-set-slot="footer">
+                <button class="btn btn-secondary" t-on-click="onGuardar">
+                    Guardar y salir
+                </button>
+                <button class="btn btn-secondary" t-on-click="onCancelarEdicion">
+                    Cancelar
+                </button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

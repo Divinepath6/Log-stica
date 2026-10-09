@@ -63,6 +63,7 @@ export class PantallaPedido extends Component {
                 [pedidoId]
             );
             if(resultado.success){
+                console.log(resultado.data);
                 const p = resultado.data;
                 this.state.guia = p.numero_guia;
                 this.state.estado = p.estado;
@@ -78,11 +79,22 @@ export class PantallaPedido extends Component {
                 this.state.numeroContrato = p.numero_contrato;
                 //listas
                 this.state.actualizaciones = p.actualizaciones;
-                this.state.detalleRacks = p.detalle_racks || [];
+                this.state.detalleRacks = p.detalle_racks.map((d,i)=> {
+                    this.state.totalCliente = (this.state.totalCliente + (d.costo_rack * d.cantidad_racks)).toFixed(2);
+                    return{
+                        clave: d.clave,
+                        numero: d.numero,
+                        costo_rack: d.costo_rack, 
+                        rack_id: d.rack_id,
+                        rack_nombre: d.rack_nombre,
+                        cantidad_racks: d.cantidad_racks,
+                        total: (d.costo_rack * d.cantidad_racks).toFixed(2)
+                    }
+                })
                 this.state.detalleCliente= p.detalle_cliente || [];
                 this.state.detalleProveedor= p.detalle_proveedor || [];
             }else{
-                
+                console.log(resultado);
             }
         } finally {
             this.state.cargando = false;
@@ -143,6 +155,64 @@ export class PantallaPedido extends Component {
         
     }
 
+
+    async onClickEditarRacks(ev) {
+        this.dialogService.add(componente_creacion_pedido,  {
+                title: "Confirmación",
+                confirm: async () => {
+                    const resultado = await this.crearPedido(clienteId)
+                    if(!resultado){
+                    }
+                    if(resultado != 0){
+                        this.notification.add(
+                        `Exitoso `,
+                        { type: "success" }
+                    );
+                    }
+                },
+                cancel: () => {
+                }
+        });
+    }
+
+    async onClickEditarDetalleCliente(ev) {
+        this.dialogService.add(componente_creacion_pedido,  {
+                title: "Confirmación",
+                confirm: async (clienteId) => {
+                    const resultado = await this.crearPedido(clienteId)
+                    if(!resultado){
+                    }
+                    if(resultado != 0){
+                        this.notification.add(
+                        `Exitoso `,
+                        { type: "success" }
+                    );
+                    }
+                },
+                cancel: () => {
+                    console.log("Cancelado");
+                }
+        });
+    }
+    async onClickEditarDetalleProveedor(ev) {
+        this.dialogService.add(componente_creacion_pedido,  {
+                title: "Confirmación",
+                confirm: async (clienteId) => {
+                    const resultado = await this.crearPedido(clienteId)
+                    if(!resultado){
+                    }
+                    if(resultado != 0){
+                        this.notification.add(
+                        `Exitoso `,
+                        { type: "success" }
+                    );
+                    }
+                },
+                cancel: () => {
+                    console.log("Cancelado");
+                }
+        });
+    }        
     
 
     // Descargar PDF ¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿

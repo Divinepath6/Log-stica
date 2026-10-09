@@ -96,7 +96,7 @@
                                     <input type="number"
                                            id="total_cliente"
                                            class="odoo-input"
-                                           step="0.01"
+                                           step="0.1"
                                            t-att-value="state.totalCliente || 0"
                                            t-on-change="(ev) => this.onFieldChange('totalCliente', ev.target.value)"/>
                                 </div>
@@ -128,7 +128,7 @@
                                         <th>Código</th>
                                         <th>Descripción</th>
                                         <th class="text-end">Costo</th>
-                                        <th class="text-center">Cant.</th>
+                                        <th class="text-end">Cant.</th>
                                         <th class="text-end">Total</th>
                                         <th></th>
                                     </tr>
@@ -136,10 +136,10 @@
                                 <tbody>
                                     <t t-if="state.detalleRacks and state.detalleRacks.length">
                                         <tr t-foreach="state.detalleRacks" t-as="r" t-key="r.id">
-                                            <td><t t-esc="r.codigo or ''"/></td>
-                                            <td><t t-esc="r.descripcion or ''"/></td>
-                                            <td class="text-end"><t t-esc="r.costo or 0"/></td>
-                                            <td class="text-center"><t t-esc="r.cantidad or 0"/></td>
+                                            <td><t t-esc="r.clave or ''"/></td>
+                                            <td><t t-esc="r.rack_nombre or ''"/></td>
+                                            <td class="text-end"><t t-esc="r.costo_rack or 0"/></td>
+                                            <td class="text-end"><t t-esc="r.cantidad_racks or 0"/></td>
                                             <td class="text-end"><t t-esc="r.total or 0"/></td>
                                             <td class="text-end">
                                                 <button class="odoo-btn odoo-btn-sm odoo-btn-ghost"
